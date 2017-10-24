@@ -10,6 +10,7 @@
 #include "drivers/rit128x96x4.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/systick.h"
+#include "driverlib/uart.h"
 #include "dataStructs.c"
 #include "inc/hw_ints.h"
 #include "inc/hw_memmap.h"
@@ -17,6 +18,7 @@
 #include "measureTask.h"
 #include "systemTimeBase.h"
 #include "warningAlarm.h"
+#include "serialComTask.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -98,6 +100,14 @@ statusData sPtrs=
 schedulerData schedPtrs=
 {
   &c1.globalCounter
+};
+
+communicationsData comPtrs={
+	d2.tempCorrectedBuf,
+	d2.bloodPressCorrectedBuf,
+	d2.pulseRateCorrectedBuf,
+	&s1.batteryState,
+	&m2.countCalls
 };
 
 //Declare the prototypes for the tasks
@@ -279,15 +289,8 @@ SysTickIntHandler(void)
   // Initialize the OLED display.
   RIT128x96x4Init(1000000);
   
-  TCB scheduleT;
-        
-  scheduleT.taskPtr = schedule;
-  scheduleT.taskDataPtr = (void*)&schedPtrs;
-    
-  TCB* aTCBPtr;
-	
-  aTCBPtr = &scheduleT;
-  aTCBPtr->taskPtr((aTCBPtr->taskDataPtr) ); 
+  //initialize scheduler
+  schedule(&schedPtrs);
           
   return;
 
@@ -305,10 +308,19 @@ void schedule(void* data)
 
   // Enable the peripherals used by this example.
   SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+ 
 
   // Enable processor interrupts.
   IntMasterEnable();
-
+  
+  GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+     
+  UARTConfigSetExpClk(UART0_BASE, SysCtlClockGet(), 460800,
+                        (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
+                         UART_CONFIG_PAR_NONE));
+	
   // Configure the two 32-bit periodic timers.
   TimerConfigure(TIMER0_BASE, TIMER_CFG_32_BIT_PER);
   TimerLoadSet(TIMER0_BASE, TIMER_A, SysCtlClockGet()/10);
@@ -326,6 +338,8 @@ void schedule(void* data)
   TCB statusT;
   TCB computeT;
   TCB warningT;
+  TCB serialComT;
+  
   
   //  Declare a working TCB pointer
   TCB* aTCBPtr;
@@ -345,6 +359,10 @@ void schedule(void* data)
 
   warningT.taskPtr = alarm;
   warningT.taskDataPtr = (void*)&wPtrs2;
+	
+  
+  serialComT.taskPtr= communicate;
+  serialComT.taskDataPtr= (void*)&comPtrs;
   
   //Initialize the task queue
   insert(&measureT);
@@ -352,9 +370,10 @@ void schedule(void* data)
   insert(&statusT);
   insert(&computeT);
   insert(&displayT);
+  insert(&serialComT);
   //insert(&scheduleT);
 
-  //Schedule and dispatch the tasks
+  //Dispatch the tasks
   while(1)
   {   
     // Reschedule tasks after 5 seconds have elapsed
@@ -365,6 +384,7 @@ void schedule(void* data)
       insert(&statusT);
       insert(&computeT);
       insert(&displayT);
+      insert(&serialComT);
     }
         
     // Continue to annunciate while other tasks are delayed
