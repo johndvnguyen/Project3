@@ -93,4 +93,5 @@ typedef struct
   unsigned char* bloodPressCorrectedBufPtr;
   unsigned char* prCorrectedBufPtr;
   unsigned short* batteryStatePtr;
+  unsigned int* countCallsPtr;
 }communicationsData;
