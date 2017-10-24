@@ -88,20 +88,18 @@ void checkWarnings(void *data)
   unsigned int* bpBuf = (*alarm).bloodPressRawBufPtr;
   unsigned int* pulseBuf = (*alarm).pulseRateRawBufPtr;
   //unsigned short* battery = (*alarm).batteryStatePtr;
-  //unsigned char* bpOut = (*alarm).bpOutOfRangePtr;
-  //unsigned char* tempOut = (*alarm).tempOutOfRangePtr;
-  //unsigned char* pulseOut = (*alarm).pulseOutOfRangePtr;
+  unsigned char* bpOut = (*alarm).bpOutOfRangePtr;
+  unsigned char* tempOut = (*alarm).tempOutOfRangePtr;
+  unsigned char* pulseOut = (*alarm).pulseOutOfRangePtr;
   Bool* bpHigh = (*alarm).bpHighPtr;
   Bool* tempHigh = (*alarm).tempHighPtr;
   Bool* pulseLow = (*alarm).pulseLowPtr;
-  //Bool* annun = (*alarm).annunciatePtr;
-  
 
   // Check vitals against prescribed ranges. Set warnings accordingly
-  checkTemp(tempBuf, tempHigh, index);
+  checkTemp(tempBuf, tempHigh, index, tempOut);
 
-  checkBp(bpBuf, bpHigh, index);
-  checkPulse(pulseBuf, pulseLow, index);
+  checkBp(bpBuf, bpHigh, index, bpOut);
+  checkPulse(pulseBuf, pulseLow, index, pulseOut);
 }
 
 
@@ -112,7 +110,7 @@ Input: pointer to temperatureRaw, pointer to tempHigh
 Output: Null
 Do: Checks if values are within normal range and sets bool accordingly.
 */
-void checkTemp(unsigned int* temp, Bool* tempHigh, int index)
+void checkTemp(unsigned int* temp, Bool* tempHigh, int index, unsigned char* tempOut)
 {
   //printf("checkTemp: %i \n", temp[index]);
   // Check if temperature is in range. Set warning accordingly
@@ -121,10 +119,12 @@ void checkTemp(unsigned int* temp, Bool* tempHigh, int index)
   {
     //printf("\n\n temp index: %i \n\n", temp[index]);
     *tempHigh = TRUE;
+    *tempOut = 89;
   } 
   else
   {
     *tempHigh = FALSE;
+    *tempOut = 78;
   }
   
 }
@@ -135,16 +135,18 @@ Input: pointer to systolicRaw, pointer to diastolicRaw, pointer to bpHigh
 Output: Null
 Do: Checks if values are within normal range and sets bool accordingly.
 */
-void checkBp(unsigned int* bpBuf, Bool* bpHigh, int index)
+void checkBp(unsigned int* bpBuf, Bool* bpHigh, int index, unsigned char* bpOut)
 {
   // Check if blood pressure is in range.  Set warnings accordingly
   if ((bpBuf[index]) > 60.5 || (bpBuf[index]) < 55.5 || (bpBuf[index + 8]) > 49.33 || (bpBuf[index + 8]) < 42.67)
   {
     *bpHigh = TRUE; 
+    *bpOut = 89;
   }
   else
   {
     *bpHigh = FALSE;
+    *bpOut = 78;
   }
 }
 
@@ -154,18 +156,19 @@ Input: pointer to pulseRateRaw, pointer to pulseLow
 Output: Null
 Do: Checks if values are within normal range and sets bool accordingly.
 */
-void checkPulse(unsigned int* pulse, Bool* pulseLow, int index)
+void checkPulse(unsigned int* pulse, Bool* pulseLow, int index, unsigned char* pulseOut)
 {
   //printf("Here: %i\n", 1);
   // Check if pulse rate is in range. Set warning accordingly.
   if ((int)(*pulse) < 60)
   {
     *pulseLow = TRUE;
-    //printf("Here: %i\n", 1);
+    *pulseOut = 89;
   }
   else
   {
     *pulseLow = FALSE;
+    *pulseOut = 78;
   }
 }
 

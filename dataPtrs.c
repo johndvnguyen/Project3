@@ -1,21 +1,6 @@
 #include "bool.h"
 
 // Holds pointers to the variables associated with measure task:
-typedef struct  
-{
-  unsigned int* temperatureRawPtr;
-  unsigned int* systolicPressRawPtr;
-  unsigned int* diastolicPressRawPtr;
-  unsigned int* pulseRateRawPtr;
-  unsigned int* countCallsPtr;
-  //Variables to simulate data measurements
-  unsigned int* sysCompletePtr;
-  unsigned int* diaCompletePtr;
-  int* tempDirectionPtr;
-  int* prDirectionPtr;
-} measureData;
-
-// Holds pointers to the variables associated with measure task:
 typedef struct
 {
   unsigned int* temperatureRawBufPtr;
@@ -33,20 +18,6 @@ typedef struct
 // Holds pointers to the variables associated with compute task:
 typedef struct 
 {
-	
-  unsigned int* temperatureRawPtr;
-  unsigned int* systolicPressRawPtr;
-  unsigned int* diastolicPressRawPtr; 
-  unsigned int* pulseRateRawPtr;
-  unsigned char** tempCorrectedPtr;
-  unsigned char** sysPressCorrectedPtr; 
-  unsigned char** diasCorrectedPtr; 
-  unsigned char** prCorrectedPtr;
-}computeData;
-
-// Holds pointers to the variables associated with compute task:
-typedef struct 
-{
   unsigned int* temperatureRawBufPtr;
   unsigned int* bloodPressRawBufPtr;
   unsigned int* pulseRateRawBufPtr;
@@ -60,41 +31,16 @@ typedef struct
 // Holds pointers to the variables associated with display task:
 typedef struct 
 {
-  unsigned char** tempCorrectedPtr;
-  unsigned char** sysCorrectedPtr;
-  unsigned char** diasCorrectedPtr;
-  unsigned char** prCorrectedPtr;
-  unsigned short* batteryStatePtr;
-}displayData;
-
-// Holds pointers to the variables associated with display task:
-typedef struct 
-{
   unsigned char* tempCorrectedBufPtr;
   unsigned char* bloodPressCorrectedBufPtr;
   unsigned char* pulseRateCorrectedBufPtr;
   unsigned short* batteryStatePtr;
   unsigned int* countCallsPtr;
-  //unsigned short* modePtr;
-}displayData2;
-
-// Holds pointers to the variables associated with warning/alarm task:
-typedef struct
-{
-  unsigned int* temperatureRawPtr;
-  unsigned int* systolicPressRawPtr;
-  unsigned int* diastolicPressRawPtr;
-  unsigned int* pulseRateRawPtr;
-  unsigned short* batteryStatePtr;
-  unsigned char* bpOutOfRangePtr;
+  unsigned short* modePtr;
   unsigned char* tempOutOfRangePtr;
+  unsigned char* bpOutOfRangePtr;
   unsigned char* pulseOutOfRangePtr;
-  Bool* bpHighPtr;
-  Bool* tempHighPtr;
-  Bool* pulseLowPtr;
-  Bool* annunciatePtr;
-  unsigned int* ledPtr;
-} warningAlarmData;
+}displayData2;
 
 // Holds pointers to the variables associated with warning/alarm task:
 typedef struct
@@ -109,7 +55,6 @@ typedef struct
   Bool* bpHighPtr;
   Bool* tempHighPtr;
   Bool* pulseLowPtr;
-  Bool* annunciatePtr;
   unsigned int* ledPtr;
   unsigned int* countCallsPtr;
   unsigned long* previousCountPtr;

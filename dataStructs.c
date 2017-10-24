@@ -1,20 +1,6 @@
 #include <stdio.h>
 #include "bool.h"
 
-typedef struct
-{
-  unsigned int temperatureRaw;
-  unsigned int systolicPressRaw;
-  unsigned int diastolicPressRaw;
-  unsigned int pulseRateRaw;
-  unsigned int countCalls;
-  unsigned int sysComplete;
-  unsigned int diaComplete;
-  int tempDirection;
-  int prDirection;
-} measurement;
-#define INIT_MEASUREMENT(X) measurement X ={75,80,80,2,0,0,0,1,1};
-
 //Change the structs to use arrays. bloodpress has both systolic and diastolic
 typedef struct
 {
@@ -28,16 +14,6 @@ typedef struct
   int prDirection;
 } measurement2;
 #define INIT_MEASUREMENT2(X) measurement2 X ={{50,NULL,NULL,NULL,NULL,NULL,NULL,NULL},{80,NULL,NULL,NULL,NULL,NULL,NULL,NULL,80,NULL,NULL,NULL,NULL,NULL,NULL,NULL},{0,NULL,NULL,NULL,NULL,NULL,NULL,NULL},0,0,0,1,1};
-
-// Project 2 display struct
-typedef struct
-{
-  unsigned char* tempCorrected;
-  unsigned char* systolicPressCorrected;
-  unsigned char* diastolicPressCorrected;
-  unsigned char* pulseRateCorrected;
-}display;
-#define INIT_DISPLAY(X) display X ={NULL,NULL,NULL,NULL};
 
 // Project 3 display struct
 typedef struct
@@ -69,7 +45,6 @@ typedef struct
   Bool bpHigh;
   Bool tempHigh;
   Bool pulseLow;
-  Bool annunciate;
   unsigned int led;
   unsigned long previousCount;
   const long pulseFlash;
@@ -77,7 +52,7 @@ typedef struct
   const long bpFlash;
   unsigned long auralCount;
 }warning;
-#define INIT_WARNING(X) warning X={FALSE,FALSE,FALSE,FALSE,0,0,20,10,5,0};
+#define INIT_WARNING(X) warning X={FALSE,FALSE,FALSE,0,0,20,10,5,0};
 
 typedef struct{
   unsigned int globalCounter;
@@ -94,10 +69,8 @@ typedef struct{
 }keypad;
 #define INIT_KEYPAD(X) keypad X={0,0,0,0,0};
 
-
 typedef struct MyStruct 
 {
-
     void (*taskPtr)(void*);
     void* taskDataPtr;
     struct MyStruct* next;

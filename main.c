@@ -24,9 +24,7 @@
 #define CLOCK_RATE              300
 
 //  Declare the globals
-INIT_MEASUREMENT(m1);
 INIT_MEASUREMENT2(m2);
-INIT_DISPLAY(d1);
 INIT_DISPLAY2(d2);
 INIT_STATUS(s1);
 INIT_ALARMS(a1);
@@ -65,7 +63,12 @@ displayData2 dPtrs2=
   d2.bloodPressCorrectedBuf,
   d2.pulseRateCorrectedBuf,
   &s1.batteryState,
-  &m2.countCalls
+  &m2.countCalls,
+  &k1.mode,
+  &a1.tempOutOfRange,
+  &a1.bpOutOfRange,
+  &a1.pulseOutOfRange
+  
 };
 
 warningAlarmData2 wPtrs2=
@@ -80,7 +83,6 @@ warningAlarmData2 wPtrs2=
   &w1.bpHigh,
   &w1.tempHigh,
   &w1.pulseLow,
-  &w1.annunciate,
   &w1.led,
   &m2.countCalls,
   &w1.previousCount,
@@ -385,7 +387,12 @@ void schedule(void* data)
 }
 
 
-
+/*
+Function insert
+Input: A node from the linked list
+Output: Null
+Do: Inserts a node (task) into the linked list
+*/
 void insert(struct MyStruct* node)
 {
   if(NULL==head){
@@ -401,9 +408,12 @@ void insert(struct MyStruct* node)
     return;
 }
 	
-	
-
-
+/*
+Function delet
+Input: A node from the linked list
+Output: Null
+Do: Deletes a node (task) into the linked list
+*/
 void delet(struct MyStruct* node)
 {
   if(NULL==head)
