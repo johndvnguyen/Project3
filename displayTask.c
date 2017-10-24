@@ -29,24 +29,19 @@ void disp(void* data)
     char bP[35];
     sprintf(bP,"Sys/Dia %d/%d mmHg",sysCorrect,diaCorrect);
     
-    
     //find the latest value of pulse rate
     unsigned char pulseCorrect =(dData->pulseRateCorrectedBufPtr[index]);
     
     char pulse[20];
     sprintf(pulse,"PR %d BPM",pulseCorrect);
     
+    //find the latest value of battery
     unsigned short battery = (*(dData->batteryStatePtr));
     
     char batt[20];
     sprintf(batt,"Batt %d ",battery);
     
-    // Initialize the OLED display.
-    RIT128x96x4Init(1000000);
-    
-    // Clear the OLED display
-    //RIT128x96x4Clear();
-    
+    // Update OLED screen to show new values
     RIT128x96x4StringDraw(temp,5,9,15);
     RIT128x96x4StringDraw(bP,5,20,15);
     RIT128x96x4StringDraw(pulse,5,30,15);

@@ -276,6 +276,9 @@ SysTickIntHandler(void)
   // Turn on LED to indicate normal state
   enableVisibleAnnunciation();
   
+  // Initialize the OLED display.
+  RIT128x96x4Init(1000000);
+  
   TCB scheduleT;
         
   scheduleT.taskPtr = schedule;
