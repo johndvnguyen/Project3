@@ -1,3 +1,4 @@
+
 #include "inc/hw_types.h"
 #include "computeTask.h"
 #include "dataPtrs.h"
@@ -14,6 +15,7 @@
 #include "inc/hw_ints.h"
 #include "inc/hw_memmap.h"
 #include "inc/lm3s8962.h"
+#include "keypadTask.h"
 #include "measureTask.h"
 #include "systemTimeBase.h"
 #include "warningAlarm.h"
@@ -90,6 +92,16 @@ warningAlarmData2 wPtrs2=
   &w1.auralCount
 };
 
+keypadData kPtrs=
+{
+  &k1.mode,
+  &k1.measurementSelection,
+  &k1.scroll,
+  &k1.selectChoice,
+  &k1.alarmAcknowledge
+
+};
+
 statusData sPtrs=
 {  
   &s1.batteryState
@@ -106,6 +118,7 @@ void measure(void* data);
 void stat(void* data);
 void alarm(void* data);
 void disp(void* data);
+void keypadfunction(void* data);
 void schedule(void* data);
 void buttonTest();
 
@@ -224,7 +237,7 @@ SysTickIntHandler(void)
 
     // Indicate that a timer interrupt has occurred.
     HWREGBITW(&g_ulFlags, FLAG_CLOCK_TICK) = 1;
-
+    if(!HWREGBITW(&g_ulFlags, FLAG_BUTTON_PRESS)){
     // Read the state of the push buttons.
     ulData = (GPIOPinRead(GPIO_PORTE_BASE, (GPIO_PIN_0 | GPIO_PIN_1 |
                                             GPIO_PIN_2 | GPIO_PIN_3)) |
@@ -254,20 +267,15 @@ SysTickIntHandler(void)
     ulDelta ^= (g_ucSwitchClockA | g_ucSwitchClockB);
 
     // See if any switches just changed debounced state.
-    if(ulDelta)
+    if(ulDelta && (g_ucSwitches != 0x1F))
     {
         // You can watch the variable for ulDelta
         // Up = 1 Right = 8 down =2 left =4  select = 16 Bit values
-        // Add the current tick count to the entropy pool.
-        printf("A button was pressed %d \n", ulDelta);
-    }
 
-    // See if the select button was just pressed.
-    if((ulDelta & 0x10) && !(g_ucSwitches & 0x10))
-    {
-        // Set a flag to indicate that the select button was just pressed.
+        printf("A button was pressed %d \n", ulDelta);
+        printf("SwitchesState %d \n", g_ucSwitches);
         HWREGBITW(&g_ulFlags, FLAG_BUTTON_PRESS) = 1;
-        //PWMGenDisable(PWM_BASE, PWM_GEN_0);
+    }
     }
 }
 
@@ -319,13 +327,14 @@ void schedule(void* data)
 
   // Enable the timers.
   TimerEnable(TIMER0_BASE, TIMER_A);
-        
+  
   //  Declare some TCBs 
   TCB displayT;
   TCB measureT;
   TCB statusT;
   TCB computeT;
   TCB warningT;
+  TCB keypadT;
   
   //  Declare a working TCB pointer
   TCB* aTCBPtr;
@@ -346,13 +355,19 @@ void schedule(void* data)
   warningT.taskPtr = alarm;
   warningT.taskDataPtr = (void*)&wPtrs2;
   
+  keypadT.taskPtr = keypadfunction;
+  keypadT.taskDataPtr = (void*)&kPtrs;
+  
   //Initialize the task queue
   insert(&measureT);
   insert(&warningT);
   insert(&statusT);
   insert(&computeT);
   insert(&displayT);
+  insert(&keypadT);
   //insert(&scheduleT);
+  
+  
 
   //Schedule and dispatch the tasks
   while(1)
@@ -365,6 +380,7 @@ void schedule(void* data)
       insert(&statusT);
       insert(&computeT);
       insert(&displayT);
+      insert(&keypadT);
     }
         
     // Continue to annunciate while other tasks are delayed
@@ -466,5 +482,5 @@ void buttonTest(){
 
     // Throw away any button presses that may have occurred while the splash
     // screens were being displayed.
-    HWREGBITW(&g_ulFlags, FLAG_BUTTON_PRESS) = 0;
+    //HWREGBITW(&g_ulFlags, FLAG_BUTTON_PRESS) = 0;
 };
