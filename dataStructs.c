@@ -75,8 +75,9 @@ typedef struct
   const long pulseFlash;
   const long tempFlash;
   const long bpFlash;
+  unsigned long auralCount;
 }warning;
-#define INIT_WARNING(X) warning X={FALSE,FALSE,FALSE,FALSE,0,0,20,10,5};
+#define INIT_WARNING(X) warning X={FALSE,FALSE,FALSE,FALSE,0,0,20,10,5,0};
 
 typedef struct{
   unsigned int globalCounter;

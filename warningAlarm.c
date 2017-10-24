@@ -9,8 +9,14 @@ Code to enable and disable light referenced from Blinky.c from StellarisWare exa
 #include <stdlib.h>
 #include <stdio.h>
 #include "bool.h"
-#include "delays.h"
 #include "systemTimeBase.h"
+#include "driverlib/pwm.h"
+#include "inc/hw_memmap.h"
+#include "inc/hw_types.h"
+#include "driverlib/debug.h"
+#include "driverlib/gpio.h"
+#include "driverlib/pwm.h"
+#include "driverlib/sysctl.h"
 
 
 /*
@@ -21,6 +27,41 @@ Do: Checks if vitals are out of range
 */
 void alarm(void *data)
 {
+  unsigned long ulPeriod;
+  //**********************************************
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOG);
+    
+    // Set GPIO F0 and G1 as PWM pins.  They are used to output the PWM0 and
+    // PWM1 signals.
+    //
+    GPIOPinTypePWM(GPIO_PORTF_BASE, GPIO_PIN_0);
+    GPIOPinTypePWM(GPIO_PORTG_BASE, GPIO_PIN_1);
+    
+    // Compute the PWM period based on the system clock.
+    //
+    ulPeriod = SysCtlClockGet() / 440;
+    
+    // Set the PWM period to 440 (A) Hz.
+    //
+    PWMGenConfigure(PWM_BASE, PWM_GEN_0,
+                    PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
+    PWMGenPeriodSet(PWM_BASE, PWM_GEN_0, ulPeriod);
+
+    //
+    // Set PWM0 to a duty cycle of 25% and PWM1 to a duty cycle of 75%.
+    //
+    PWMPulseWidthSet(PWM_BASE, PWM_OUT_0, ulPeriod / 4);
+    PWMPulseWidthSet(PWM_BASE, PWM_OUT_1, ulPeriod * 3 / 4);
+
+    //
+    // Enable the PWM0 and PWM1 output signals.
+    //
+    PWMOutputState(PWM_BASE, PWM_OUT_0_BIT | PWM_OUT_1_BIT, true);
+
+    //PWMGenEnable(PWM_BASE, PWM_GEN_0);
+    //**********************************************
     //printf("\n CHECKING WARNINGS! \n");
     //warningAlarmData * alarm = (warningAlarmData*) data;
     checkWarnings(data);
@@ -46,14 +87,14 @@ void checkWarnings(void *data)
   unsigned int* tempBuf = (*alarm).temperatureRawBufPtr;
   unsigned int* bpBuf = (*alarm).bloodPressRawBufPtr;
   unsigned int* pulseBuf = (*alarm).pulseRateRawBufPtr;
-  unsigned short* battery = (*alarm).batteryStatePtr;
-  unsigned char* bpOut = (*alarm).bpOutOfRangePtr;
-  unsigned char* tempOut = (*alarm).tempOutOfRangePtr;
-  unsigned char* pulseOut = (*alarm).pulseOutOfRangePtr;
+  //unsigned short* battery = (*alarm).batteryStatePtr;
+  //unsigned char* bpOut = (*alarm).bpOutOfRangePtr;
+  //unsigned char* tempOut = (*alarm).tempOutOfRangePtr;
+  //unsigned char* pulseOut = (*alarm).pulseOutOfRangePtr;
   Bool* bpHigh = (*alarm).bpHighPtr;
   Bool* tempHigh = (*alarm).tempHighPtr;
   Bool* pulseLow = (*alarm).pulseLowPtr;
-  Bool* annun = (*alarm).annunciatePtr;
+  //Bool* annun = (*alarm).annunciatePtr;
   
 
   // Check vitals against prescribed ranges. Set warnings accordingly
@@ -148,6 +189,7 @@ void annunciate(void *data)
       { 
         if(globalCounter - (*previousCount) >= pulseFlash)
         {
+          
           (*previousCount) = globalCounter;
           printf("PREVIOUS COUNT: %i \n", (*previousCount));
           //printf("PULSELOW LED \n\n");

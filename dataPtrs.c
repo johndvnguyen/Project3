@@ -116,6 +116,7 @@ typedef struct
   const long* pulseFlashPtr;
   const long* tempFlashPtr;
   const long* bpFlashPtr;
+  unsigned long* auralCountPtr;
 } warningAlarmData2;
 
 // Holds pointers to the variables associated with status task:

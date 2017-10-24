@@ -283,6 +283,7 @@
           <state>$PROJ_DIR$\</state>
           <state>$PROJ_DIR$\..</state>
           <state>$PROJ_DIR$\..\..\..</state>
+          <state>$C:\STELLARISWARE\..\..</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1636,12 +1637,6 @@
     <name>$PROJ_DIR$\bool.h</name>
   </file>
   <file>
-    <name>$PROJ_DIR$\buttontest.c</name>
-  </file>
-  <file>
-    <name>$PROJ_DIR$\buttontest.h</name>
-  </file>
-  <file>
     <name>$PROJ_DIR$\computeTask.c</name>
   </file>
   <file>
@@ -1655,12 +1650,6 @@
   </file>
   <file>
     <name>$PROJ_DIR$\dataStructs.c</name>
-  </file>
-  <file>
-    <name>$PROJ_DIR$\delays.c</name>
-  </file>
-  <file>
-    <name>$PROJ_DIR$\delays.h</name>
   </file>
   <file>
     <name>$PROJ_DIR$\displayTask.c</name>
@@ -1679,6 +1668,9 @@
   </file>
   <file>
     <name>$PROJ_DIR$\measureTask.h</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\..\..\..\driverlib\pwm.h</name>
   </file>
   <file>
     <name>$PROJ_DIR$\..\drivers\rit128x96x4.c</name>
