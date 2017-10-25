@@ -155,41 +155,6 @@ void measureDiaBPArray(void* data){
 };
 
 
-
-
-/*
-Function measurePr
-Input pointer to measureData
-Output Null
-Do: updates the tempRaw based on algorithm
-*/
-//void measurePR(void* data){
-//    measureData* measureDataPtr = (measureData*) data;
-//    
-//    unsigned int* countCalls = (*measureDataPtr).countCallsPtr;
-//    unsigned int* prRaw = (*measureDataPtr).pulseRateRawPtr;
-//    int* direction = (*measureDataPtr).prDirectionPtr;
-//    
-//    
-//  //If pulse rate is above 40 and increasing swap the direction
-//  if (40<=*prRaw && 1 == *direction){
-//    *direction = -1;
-//  }
-//  //If pulseRate is below 15 and decreasing swap the direction
-//  else if (15>=*prRaw && -1 == *direction){  
-//    *direction = 1;
-//  }
-//  // increment or decrement (using the direction value)
-//  if (*countCalls % 2  == 0){
-//    // even
-//    *prRaw -= *direction;
-//  }
-//  //odd
-//  else {
-//    *prRaw += (*direction * 3);
-//  }
-//
-//};
 /*
 Function measurePrArray
 Input pointer to measureData
@@ -197,6 +162,37 @@ Output Null
 Do: Needs to be updated with the model transducer handling.
 */
 void measurePRArray(void* data){
-
+ int check=0;
+    int beatCount=0;
+    int bpm=0;
+    measureData2* measureDataPtr = (measureData2*) data;
+    unsigned int clock = globalCounter;//(*measureDataPtr).globalCounterPtr;
+    unsigned int temp=clock;
+    while(clock<temp+30){
+        
+        clock=globalCounter;//(*measureDataPtr).globalCounterPtr;
+        unsigned long* beat=(*measureDataPtr).prPtr;
+        
+        if(*beat==1 && check==0){
+            beatCount++;
+            check=1;
+        }
+        else if(*beat==0){
+           check=0;
+        }
+    }
+    
+    bpm=(beatCount*60/3);
+    
+    unsigned int* countCalls = (*measureDataPtr).countCallsPtr;
+    unsigned int* bloodPressRawBuf = (*measureDataPtr).pulseRateRawBufPtr;
+    unsigned int prLast = (*countCalls) %8;
+    unsigned int prNext = (*countCalls+1) %8; 
+    
+    int change = ((bloodPressRawBuf[prLast]-bpm)*100)/(bloodPressRawBuf[prLast]);
+    
+    if(change>=15||change<=-15){
+        bloodPressRawBuf[prNext]=bpm;
+    }
 
 }
