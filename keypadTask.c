@@ -30,9 +30,9 @@ void keypadfunction(void* data)
     unsigned short alarmAcknowledge;
     */
     unsigned short * modePtr = (*keypadDataPtr).modePtr;
-    
+    /*
     //Check to see what button is pressed
-    buttonPressed = g_ucSwitches ^ 21;
+    //buttonPressed = g_ucSwitches ^ 21;
     // Up = 1 Right = 8 down =2 left =4  select = 16 Bit values
     // To switch mode we press left and right
     switch(buttonPressed)
@@ -46,6 +46,7 @@ void keypadfunction(void* data)
           
       
     }
+    */
     
     printf("Pressed button: %d \n", g_ucSwitches);
     

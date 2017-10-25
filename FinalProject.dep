@@ -2,155 +2,131 @@
 
 <project>
   <fileVersion>2</fileVersion>
-  <fileChecksum>3003290530</fileChecksum>
+  <fileChecksum>1590490975</fileChecksum>
   <configuration>
     <name>Debug</name>
     <outputs>
-      <file>$PROJ_DIR$\..\SU_MedicalDevice_ES\buttontest.c</file>
-      <file>$TOOLKIT_DIR$\inc\c\DLib_Config_Full.h</file>
-      <file>$PROJ_DIR$\keypadTask.c</file>
-      <file>$PROJ_DIR$\keypadTask.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\computeTask.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\inc\hw_ssi.h</file>
+      <file>$PROJ_DIR$\dataPtrs.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\startup_ewarm.o</file>
+      <file>$PROJ_DIR$\..\..\..\inc\hw_types.h</file>
+      <file>$PROJ_DIR$\bool.c</file>
+      <file>$PROJ_DIR$\computeTask.h</file>
+      <file>$PROJ_DIR$\computeTask.c</file>
+      <file>$PROJ_DIR$\bool.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\delays.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\buttontest.o</file>
+      <file>$PROJ_DIR$\dataPtrs.c</file>
+      <file>$PROJ_DIR$\displayTask.h</file>
+      <file>$PROJ_DIR$\displayTask.c</file>
+      <file>$PROJ_DIR$\main.c</file>
+      <file>$PROJ_DIR$\..\drivers\rit128x96x4.h</file>
+      <file>$PROJ_DIR$\Flags.h</file>
+      <file>$PROJ_DIR$\..\hello\startup_ewarm.c</file>
+      <file>$PROJ_DIR$\..\..\..\driverlib\ewarm\Exe\driverlib.a</file>
+      <file>$PROJ_DIR$\dataStructs.c</file>
+      <file>$PROJ_DIR$\..\drivers\rit128x96x4.c</file>
+      <file>$PROJ_DIR$\..\..\..\driverlib\pwm.h</file>
+      <file>$PROJ_DIR$\serialComTask.h</file>
+      <file>$PROJ_DIR$\serialComTask.c</file>
+      <file>$PROJ_DIR$\measureTask.c</file>
+      <file>$PROJ_DIR$\measureTask.h</file>
+      <file>$PROJ_DIR$\statusTask.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\warningAlarm.pbi</file>
+      <file>$PROJ_DIR$\systemTimeBase.c</file>
+      <file>$PROJ_DIR$\statusTask.h</file>
+      <file>$PROJ_DIR$\warningAlarm.c</file>
+      <file>$PROJ_DIR$\systemTimeBase.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\rit128x96x4.o</file>
+      <file>$PROJ_DIR$\buttontest.c</file>
+      <file>$PROJ_DIR$\warningAlarm.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\dataStructs.pbi</file>
+      <file>$TOOLKIT_DIR$\lib\rt7M_tl.a</file>
+      <file>$PROJ_DIR$\..\..\..\inc\lm3s8962.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\statusTask.o</file>
+      <file>$PROJ_DIR$\..\..\..\driverlib\uart.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\measureTask.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\main.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\inc\hw_ints.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\displayTask.pbi</file>
+      <file>$PROJ_DIR$\delays.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\dataPtrs.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\bool.o</file>
+      <file>$PROJ_DIR$\delays.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\buttontest.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\systemTimeBase.o</file>
+      <file>$PROJ_DIR$\..\..\..\inc\hw_memmap.h</file>
+      <file>$PROJ_DIR$\..\..\..\driverlib\gpio.h</file>
+      <file>$PROJ_DIR$\..\..\..\driverlib\systick.h</file>
+      <file>$PROJ_DIR$\..\..\..\driverlib\ssi.h</file>
+      <file>$PROJ_DIR$\..\..\..\inc\hw_sysctl.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\measureTask.pbi</file>
+      <file>$TOOLKIT_DIR$\config\generic_cortex.icf</file>
+      <file>$PROJ_DIR$\Debug\Obj\systemTimeBase.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\startup_ewarm.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\dataStructs.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\warningAlarm.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\bool.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\driverlib\sysctl.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\rit128x96x4.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\displayTask.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\serialComTask.o</file>
+      <file>$PROJ_DIR$\..\..\..\driverlib\interrupt.h</file>
+      <file>$PROJ_DIR$\..\..\..\driverlib\debug.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\FinalProject.pbd</file>
+      <file>$PROJ_DIR$\Debug\Obj\dataPtrs.pbi</file>
+      <file>$TOOLKIT_DIR$\lib\shb_l.a</file>
+      <file>$PROJ_DIR$\Debug\Exe\FinalProject.out</file>
+      <file>$PROJ_DIR$\..\..\..\utils\ustdlib.h</file>
+      <file>$PROJ_DIR$\..\..\..\utils\ustdlib.c</file>
+      <file>$PROJ_DIR$\..\..\..\driverlib\timer.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\main.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\statusTask.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\computeTask.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\serialComTask.pbi</file>
       <file>$PROJ_DIR$\Debug\Obj\keypadTask.pbi</file>
       <file>$PROJ_DIR$\Debug\Obj\keypadTask.o</file>
-      <file>$PROJ_DIR$\..\..\..\driverlib\cpu.c</file>
-      <file>$PROJ_DIR$\..\..\..\driverlib\interrupt.c</file>
-      <file>$TOOLKIT_DIR$\inc\c\stdlib.h</file>
-      <file>$TOOLKIT_DIR$\inc\c\xencoding_limits.h</file>
-      <file>$TOOLKIT_DIR$\inc\c\yvals.h</file>
-      <file>$TOOLKIT_DIR$\inc\c\DLib_Threads.h</file>
-      <file>$TOOLKIT_DIR$\inc\c\ystdio.h</file>
-      <file>$TOOLKIT_DIR$\lib\dl7M_tlf.a</file>
-      <file>$TOOLKIT_DIR$\inc\c\ycheck.h</file>
-      <file>$TOOLKIT_DIR$\inc\c\stdio.h</file>
-      <file>$TOOLKIT_DIR$\inc\c\DLib_Product_string.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Config_Full.h</file>
+      <file>$PROJ_DIR$\keypadTask.c</file>
       <file>$TOOLKIT_DIR$\lib\m7M_tl.a</file>
-      <file>$TOOLKIT_DIR$\inc\c\string.h</file>
+      <file>$TOOLKIT_DIR$\lib\dl7M_tlf.a</file>
+      <file>$PROJ_DIR$\keypadTask.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdlib.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\yvals.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\ystdio.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\xencoding_limits.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Product_string.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Threads.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\time.h</file>
       <file>$TOOLKIT_DIR$\inc\c\DLib_Product.h</file>
-      <file>$TOOLKIT_DIR$\inc\c\DLib_Defaults.h</file>
       <file>$TOOLKIT_DIR$\inc\c\ysizet.h</file>
-      <file>$PROJ_DIR$\bool.c</file>
-      <file>$PROJ_DIR$\bool.h</file>
-      <file>$PROJ_DIR$\computeTask.c</file>
-      <file>$PROJ_DIR$\computeTask.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\systemTimeBase.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\warningAlarm.pbi</file>
-      <file>$PROJ_DIR$\dataPtrs.c</file>
-      <file>$PROJ_DIR$\dataPtrs.h</file>
-      <file>$PROJ_DIR$\displayTask.c</file>
-      <file>$PROJ_DIR$\dataStructs.c</file>
-      <file>$PROJ_DIR$\displayTask.h</file>
-      <file>$PROJ_DIR$\..\..\..\driverlib\pwm.h</file>
-      <file>$PROJ_DIR$\..\drivers\rit128x96x4.c</file>
-      <file>$PROJ_DIR$\..\hello\startup_ewarm.c</file>
-      <file>$PROJ_DIR$\statusTask.c</file>
-      <file>$PROJ_DIR$\..\..\..\driverlib\ewarm\Exe\driverlib.a</file>
-      <file>$PROJ_DIR$\measureTask.c</file>
-      <file>$PROJ_DIR$\..\drivers\rit128x96x4.h</file>
-      <file>$PROJ_DIR$\main.c</file>
-      <file>$PROJ_DIR$\measureTask.h</file>
-      <file>$PROJ_DIR$\systemTimeBase.h</file>
-      <file>$PROJ_DIR$\statusTask.h</file>
-      <file>$PROJ_DIR$\systemTimeBase.c</file>
-      <file>$PROJ_DIR$\warningAlarm.c</file>
-      <file>$PROJ_DIR$\Debug\Obj\main.pbi</file>
-      <file>$PROJ_DIR$\warningAlarm.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\displayTask.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\rit128x96x4.o</file>
-      <file>$PROJ_DIR$\..\..\..\inc\hw_ssi.h</file>
-      <file>$PROJ_DIR$\..\..\..\driverlib\ssi.h</file>
-      <file>$TOOLKIT_DIR$\lib\shb_l.a</file>
-      <file>$PROJ_DIR$\Debug\Obj\computeTask.pbi</file>
-      <file>$PROJ_DIR$\..\..\..\driverlib\timer.h</file>
-      <file>$PROJ_DIR$\..\..\..\driverlib\gpio.h</file>
-      <file>$PROJ_DIR$\..\..\..\inc\hw_types.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\systemTimeBase.pbi</file>
-      <file>$PROJ_DIR$\..\..\..\inc\hw_memmap.h</file>
-      <file>$PROJ_DIR$\..\..\..\inc\lm3s8962.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\FinalProject.pbd</file>
-      <file>$PROJ_DIR$\Debug\Obj\dataStructs.pbi</file>
-      <file>$PROJ_DIR$\..\..\..\driverlib\systick.h</file>
-      <file>$PROJ_DIR$\..\..\..\driverlib\debug.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\statusTask.o</file>
-      <file>$PROJ_DIR$\..\..\..\driverlib\interrupt.h</file>
-      <file>$PROJ_DIR$\..\..\..\inc\hw_sysctl.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\startup_ewarm.pbi</file>
-      <file>$PROJ_DIR$\..\..\..\driverlib\sysctl.h</file>
-      <file>$PROJ_DIR$\..\..\..\inc\hw_ints.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\statusTask.pbi</file>
-      <file>$TOOLKIT_DIR$\lib\rt7M_tl.a</file>
-      <file>$PROJ_DIR$\Debug\Obj\rit128x96x4.pbi</file>
-      <file>$PROJ_DIR$\..\..\..\driverlib\gpio.c</file>
-      <file>$PROJ_DIR$\Debug\Obj\measureTask.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\displayTask.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\main.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\dataStructs.o</file>
-      <file>$TOOLKIT_DIR$\config\generic_cortex.icf</file>
-      <file>$PROJ_DIR$\Debug\Obj\measureTask.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\bool.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\bool.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\startup_ewarm.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\dataPtrs.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\warningAlarm.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\computeTask.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\dataPtrs.o</file>
-      <file>$PROJ_DIR$\Debug\Exe\FinalProject.out</file>
-      <file>$PROJ_DIR$\..\..\..\driverlib\sysctl.c</file>
-      <file>$PROJ_DIR$\..\qs_ek-lm3s8962\globals.h</file>
-      <file>$PROJ_DIR$\..\qs_ek-lm3s8962\qs_ek-lm3s8962.c</file>
-      <file>$PROJ_DIR$\..\qs_ek-lm3s8962\game.c</file>
+      <file>$TOOLKIT_DIR$\inc\c\string.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\ycheck.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Defaults.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdarg.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdio.h</file>
     </outputs>
-    <file>
-      <name>[ROOT_NODE]</name>
-      <outputs>
-        <tool>
-          <name>ILINK</name>
-          <file> 87</file>
-        </tool>
-      </outputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\keypadTask.c</name>
-      <outputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 5</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 4</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 15 14 10 20 1 19 9 11 21 12 3 29 28 23 56</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 15 14 10 20 19 9 11 21 12 3 29 28 23 56</file>
-        </tool>
-      </inputs>
-    </file>
     <file>
       <name>$PROJ_DIR$\bool.c</name>
       <outputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 81</file>
+          <name>BICOMP</name>
+          <file> 61</file>
         </tool>
         <tool>
-          <name>BICOMP</name>
-          <file> 80</file>
+          <name>ICCARM</name>
+          <file> 46</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 23</file>
+          <name>BICOMP</name>
+          <file> 8</file>
         </tool>
         <tool>
-          <name>BICOMP</name>
-          <file> 23</file>
+          <name>ICCARM</name>
+          <file> 8</file>
         </tool>
       </inputs>
     </file>
@@ -158,22 +134,22 @@
       <name>$PROJ_DIR$\computeTask.c</name>
       <outputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 85</file>
+          <name>BICOMP</name>
+          <file> 0</file>
         </tool>
         <tool>
-          <name>BICOMP</name>
-          <file> 53</file>
+          <name>ICCARM</name>
+          <file> 77</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 28 23 31 15 14 10 20 1 19 9 11 21 12 42</file>
+          <name>BICOMP</name>
+          <file> 11 8 19 99 96 87 97 93 89 91 94 88 31</file>
         </tool>
         <tool>
-          <name>BICOMP</name>
-          <file> 28 23 31 15 14 10 20 19 9 11 21 12 42</file>
+          <name>ICCARM</name>
+          <file> 11 8 19 99 96 87 97 81 93 89 91 94 88 31</file>
         </tool>
       </inputs>
     </file>
@@ -181,22 +157,22 @@
       <name>$PROJ_DIR$\dataPtrs.c</name>
       <outputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 86</file>
+          <name>BICOMP</name>
+          <file> 69</file>
         </tool>
         <tool>
-          <name>BICOMP</name>
-          <file> 83</file>
+          <name>ICCARM</name>
+          <file> 45</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 23</file>
+          <name>BICOMP</name>
+          <file> 8</file>
         </tool>
         <tool>
-          <name>BICOMP</name>
-          <file> 23</file>
+          <name>ICCARM</name>
+          <file> 8</file>
         </tool>
       </inputs>
     </file>
@@ -204,127 +180,22 @@
       <name>$PROJ_DIR$\displayTask.c</name>
       <outputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 75</file>
-        </tool>
-        <tool>
           <name>BICOMP</name>
-          <file> 48</file>
+          <file> 43</file>
         </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 32 31 15 14 10 20 1 19 9 11 21 12 23 28 39 42</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 32 31 15 14 10 20 19 9 11 21 12 23 28 39 42</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\dataStructs.c</name>
-      <outputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 77</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 61</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 15 14 10 20 1 19 9 11 21 12 23</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 15 14 10 20 19 9 11 21 12 23</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\drivers\rit128x96x4.c</name>
-      <outputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 49</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 72</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 50 58 66 56 63 55 51 68 39</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 50 58 66 56 63 55 51 68 39</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\hello\startup_ewarm.c</name>
-      <outputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 82</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 67</file>
-        </tool>
-      </outputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\statusTask.c</name>
-      <outputs>
         <tool>
           <name>ICCARM</name>
           <file> 64</file>
         </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 70</file>
-        </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 43 31 15 14 10 20 1 19 9 11 21 12 23 28 42</file>
-        </tool>
-        <tool>
           <name>BICOMP</name>
-          <file> 43 31 15 14 10 20 19 9 11 21 12 23 28 42</file>
+          <file> 12 19 99 96 87 97 93 89 91 94 88 8 11 15 31 73 95 90 67 72 98</file>
         </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\measureTask.c</name>
-      <outputs>
         <tool>
           <name>ICCARM</name>
-          <file> 74</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 79</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 15 14 10 20 1 19 9 11 21 12 41 29 28 23 42</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 15 14 10 20 19 9 11 21 12 41 29 28 23 42</file>
+          <file> 12 19 99 96 87 97 81 93 89 91 94 88 8 11 15 31 73 95 90 67 72 98</file>
         </tool>
       </inputs>
     </file>
@@ -332,22 +203,150 @@
       <name>$PROJ_DIR$\main.c</name>
       <outputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 76</file>
+          <name>BICOMP</name>
+          <file> 41</file>
         </tool>
         <tool>
-          <name>BICOMP</name>
-          <file> 46</file>
+          <name>ICCARM</name>
+          <file> 75</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 56 25 29 28 23 32 63 55 65 54 33 39 68 62 31 15 14 10 20 1 19 9 11 21 12 69 58 59 3 41 42 47 18 16 8</file>
+          <name>BICOMP</name>
+          <file> 4 6 2 11 8 12 67 51 66 74 21 15 62 52 39 19 99 96 87 97 93 89 91 94 88 42 50 37 25 85 22 31 34 16 95 90 86 92</file>
         </tool>
         <tool>
+          <name>ICCARM</name>
+          <file> 4 6 2 11 8 12 67 51 66 74 21 15 62 52 39 19 99 96 87 97 81 93 89 91 94 88 42 50 37 25 85 22 31 34 16 95 90 86 92</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\hello\startup_ewarm.c</name>
+      <outputs>
+        <tool>
           <name>BICOMP</name>
-          <file> 56 25 29 28 23 32 63 55 65 54 33 39 68 62 31 15 14 10 20 19 9 11 21 12 69 58 59 3 41 42 47 18 16 8</file>
+          <file> 58</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 3</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\dataStructs.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 35</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 59</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 99 96 87 97 93 89 91 94 88 8</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 99 96 87 97 81 93 89 91 94 88 8</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\drivers\rit128x96x4.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 63</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 32</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 1 50 54 4 67 51 53 62 15</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 1 50 54 4 67 51 53 62 15</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\serialComTask.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 78</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 65</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 42 50 4 67 51 66 62 39 15 19 99 96 87 97 93 89 91 94 88 8 2 11</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 42 50 4 67 51 66 62 39 15 19 99 96 87 97 81 93 89 91 94 88 8 2 11</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\measureTask.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 55</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 40</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 99 96 87 97 93 89 91 94 88 25 2 11 8 31</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 99 96 87 97 81 93 89 91 94 88 25 2 11 8 31</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\statusTask.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 76</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 38</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 29 19 99 96 87 97 93 89 91 94 88 8 11 31</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 29 19 99 96 87 97 81 93 89 91 94 88 8 11 31</file>
         </tool>
       </inputs>
     </file>
@@ -355,22 +354,22 @@
       <name>$PROJ_DIR$\systemTimeBase.c</name>
       <outputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 26</file>
-        </tool>
-        <tool>
           <name>BICOMP</name>
           <file> 57</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 49</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 42</file>
+          <name>BICOMP</name>
+          <file> 31</file>
         </tool>
         <tool>
-          <name>BICOMP</name>
-          <file> 42</file>
+          <name>ICCARM</name>
+          <file> 31</file>
         </tool>
       </inputs>
     </file>
@@ -378,22 +377,50 @@
       <name>$PROJ_DIR$\warningAlarm.c</name>
       <outputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 84</file>
-        </tool>
-        <tool>
           <name>BICOMP</name>
           <file> 27</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 60</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 59 47 23 28 8 14 10 20 1 19 9 11 21 15 12 42 33 56 58 63 55 68</file>
+          <name>BICOMP</name>
+          <file> 37 34 8 11 86 96 87 97 93 89 91 94 99 88 31 21 4 50 67 51 62 16</file>
         </tool>
         <tool>
+          <name>ICCARM</name>
+          <file> 37 34 8 11 86 96 87 97 81 93 89 91 94 99 88 31 21 4 50 67 51 62 16</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\buttontest.c</name>
+      <outputs>
+        <tool>
           <name>BICOMP</name>
-          <file> 59 47 23 28 8 14 10 20 19 9 11 21 15 12 42 33 56 58 63 55 68</file>
+          <file> 48</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 10</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\delays.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 9</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 44</file>
         </tool>
       </inputs>
     </file>
@@ -402,7 +429,7 @@
       <inputs>
         <tool>
           <name>BILINK</name>
-          <file> 80 53 83 61 48 4 46 79 72 67 70 57 27</file>
+          <file> 61 0 69 35 43 79 41 55 63 78 58 76 57 27</file>
         </tool>
       </inputs>
     </file>
@@ -411,10 +438,42 @@
       <inputs>
         <tool>
           <name>ILINK</name>
-          <file> 78 81 85 86 77 75 5 76 74 49 82 64 26 84 37 52 71 17 13</file>
+          <file> 56 46 77 45 59 64 75 40 32 65 3 38 49 60 18 70 36 83 84</file>
         </tool>
       </inputs>
     </file>
+    <file>
+      <name>$PROJ_DIR$\keypadTask.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 79</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 99 96 87 97 93 89 91 94 88 85 2 11 8 4</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 99 96 87 97 81 93 89 91 94 88 85 2 11 8 4</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>ILINK</name>
+          <file> 71</file>
+        </tool>
+      </outputs>
+    </file>
+    <forcedrebuild>
+      <name>[MULTI_TOOL]</name>
+      <tool>ILINK</tool>
+    </forcedrebuild>
   </configuration>
   <configuration>
     <name>Release</name>
