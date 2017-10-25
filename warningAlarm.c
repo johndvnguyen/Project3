@@ -28,6 +28,8 @@ Do: Checks if vitals are out of range
 void alarm(void *data)
 {
   warningAlarmData2 * alarm = (warningAlarmData2*) data;
+  
+  // Call functions
   checkWarnings(data);
   annunciate(data);
   auralAnnunciate(data);
@@ -54,6 +56,7 @@ void checkWarnings(void *data)
   //find the current index of the array based on call count. 
   unsigned int index = ((*(alarm->countCallsPtr)) % 8);
   
+  // Get data from structs to use in functions
   unsigned int* tempBuf = (*alarm).temperatureRawBufPtr;
   unsigned int* bpBuf = (*alarm).bloodPressRawBufPtr;
   unsigned int* pulseBuf = (*alarm).pulseRateRawBufPtr;
@@ -136,19 +139,27 @@ void checkPulse(unsigned int* pulse, Bool* pulseLow, int index, unsigned char* p
   }
 }
 
+/*
+Function auralAnnunciate
+Input: warning data
+Output: Sound
+Do: Checks if there is a warning and creates aural annunciation
+*/
 void auralAnnunciate(void *data)
 {
   warningAlarmData2 * alarm = (warningAlarmData2*) data;
+  
+  // If warning true
   if((*(alarm->tempHighPtr)) || (*(alarm->pulseLowPtr)) || (*(alarm->bpHighPtr)))
   {
-    // updated from 50 to 5000 to test without alarms going off
+    // Enable if 5 seconds have elapsed since last button press
     if(auralFlag == 0 && (globalCounter - auralCounter >= 50))
     {
       auralFlag = 1;
       PWMGenEnable(PWM_BASE, PWM_GEN_0);
     }
   } 
-  
+  // Disable if no warning present
   else
   {
     if(auralFlag == 1)
@@ -159,6 +170,7 @@ void auralAnnunciate(void *data)
   }
   
 }
+
 /*
 Function: annunciate
 Input: warning data
@@ -168,6 +180,8 @@ Do: Flashes LED at rate per specific warning.
 void annunciate(void *data)
 {
   warningAlarmData2 * alarm = (warningAlarmData2*) data;
+  
+  // Get data from struct
   unsigned int* led = (*alarm).ledPtr;
   unsigned long* previousCount = (*alarm).previousCountPtr;
   const long pulseFlash = *(alarm->pulseFlashPtr);
@@ -175,67 +189,62 @@ void annunciate(void *data)
   const long bpFlash = *(alarm->bpFlashPtr);
   
   // Flash at the correct rate for each warning.
-      if(*(alarm->tempHighPtr)) //if(*(alarm->pulseLowPtr))
-      { 
-        if(globalCounter - (*previousCount) >= pulseFlash)
-        {
-          
-          (*previousCount) = globalCounter;
-          //printf("PREVIOUS COUNT: %i \n", (*previousCount));
-          //printf("PULSELOW LED \n\n");
-          if((*led) == 1)
-          {
-            //printf("LED OFF \n\n");
-            disableVisibleAnnunciation();
-            (*led) = 0;
-          }
-          else
-          {
-            //printf("LED ON \n\n");
-            enableVisibleAnnunciation();
-            (*led) = 1;
-          }
-        }    
-      }
-      else if (*(alarm->pulseLowPtr))
+  //Pulse
+  if(*(alarm->pulseLowPtr))
+  { 
+    if(globalCounter - (*previousCount) >= pulseFlash)
+    {
+      
+      (*previousCount) = globalCounter;
+      if((*led) == 1)
       {
-        if(globalCounter - (*previousCount) >= tempFlash)
-        { 
-          (*previousCount) = globalCounter;
-          //printf("PREVIOUS COUNT: %i \n", (*previousCount));
-          //printf("TEMPHIGH LED \n\n");
-          if((*led) == 1)
-          {
-            disableVisibleAnnunciation();
-            (*led) = 0;
-          }
-          else
-          {
-            enableVisibleAnnunciation();  
-            (*led) = 1;
-          }
-        }
+        disableVisibleAnnunciation();
+        (*led) = 0;
       }
-      else if (*(alarm->bpHighPtr))
+      else
       {
-        if(globalCounter - (*previousCount) >= bpFlash)
-        {
-          (*previousCount) = globalCounter;
-          printf("BPHIGH LED \n\n");
-          if((*led) == 1)
-          {
-            disableVisibleAnnunciation();
-            (*led) = 0;
-          }
-          else
-          {
-            enableVisibleAnnunciation();
-            (*led) = 1;
-          }
-        }
+        enableVisibleAnnunciation();
+        (*led) = 1;
       }
-      return;
- 
+    }    
+  }
+  //Temp
+  else if (*(alarm->tempHighPtr))
+  {
+    if(globalCounter - (*previousCount) >= tempFlash)
+    { 
+      (*previousCount) = globalCounter;
+      if((*led) == 1)
+      {
+        disableVisibleAnnunciation();
+        (*led) = 0;
+      }
+      else
+      {
+        enableVisibleAnnunciation();  
+        (*led) = 1;
+      }
+    }
+  }
+  // Flash
+  else if (*(alarm->bpHighPtr))
+  {
+    if(globalCounter - (*previousCount) >= bpFlash)
+    {
+      (*previousCount) = globalCounter;
+      if((*led) == 1)
+      {
+        disableVisibleAnnunciation();
+        (*led) = 0;
+      }
+      else
+      {
+        enableVisibleAnnunciation();
+        (*led) = 1;
+      }
+    }
+  }
+  return; 
 }
 
 /*

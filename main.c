@@ -121,11 +121,11 @@ schedulerData schedPtrs=
 };
 
 communicationsData comPtrs={
-	d2.tempCorrectedBuf,
-	d2.bloodPressCorrectedBuf,
-	d2.pulseRateCorrectedBuf,
-	&s1.batteryState,
-	&m2.countCalls
+  d2.tempCorrectedBuf,
+  d2.bloodPressCorrectedBuf,
+  d2.pulseRateCorrectedBuf,
+  &s1.batteryState,
+  &m2.countCalls
 };
 
 //Declare the prototypes for the tasks
@@ -135,20 +135,25 @@ void stat(void* data);
 void alarm(void* data);
 void disp(void* data);
 void schedule(void* data);
-void buttonTest();
 void keypadfunction(void* data);
+void startup();
 
+// Declare functions to control linked list
 void add(struct MyStruct* node);
 void insert(struct MyStruct* current, struct MyStruct* new);
+void delet(struct MyStruct* node);
+
+// Declare structs for linked list
 struct MyStruct* head=NULL;
 struct MyStruct* tail=NULL;
 struct MyStruct* nodeRef=NULL;
-void delet(struct MyStruct* node);
 
+// Global counters
 unsigned volatile int globalCounter = 0;
 unsigned int auralCounter = 0;
 unsigned int pulseFreq=4;
 unsigned int pulseCount=0;
+
 //*****************************************************************************
 //
 // Flags that contain the current value of the interrupt indicator as displayed
@@ -159,8 +164,6 @@ unsigned long g_ulFlags;
 unsigned long auralFlag;
 unsigned long computeFlag;
 unsigned long serialFlag;
-
-
 
 //*****************************************************************************
 //
@@ -213,8 +216,6 @@ unsigned char g_ucSwitches = 0x1f;
 static unsigned char g_ucSwitchClockA = 0;
 static unsigned char g_ucSwitchClockB = 0;
 
-
-
 //*****************************************************************************
 //
 // The error routine that is called if the driver library encounters an error.
@@ -226,6 +227,7 @@ __error__(char *pcFilename, unsigned long ulLine)
 {
 }
 #endif
+
 //*****************************************************************************
 //
 // The interrupt handler for the first timer interrupt.
@@ -234,19 +236,15 @@ __error__(char *pcFilename, unsigned long ulLine)
 void
 Timer0IntHandler(void)
 {
-    //
     // Clear the timer interrupt.
-    //
     TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
 
-    //
     // Update the global counter.
-    //
     IntMasterDisable();
     increment();
-    //annunciate(&wPtrs2);
     IntMasterEnable();
 }
+
 //*****************************************************************************
 //
 // The interrupt handler for the pulse rate transducer interrupt.
@@ -255,9 +253,7 @@ Timer0IntHandler(void)
 void
 Timer2IntHandler(void)
 {
-    //
     // Clear the timer interrupt.
-    //
     TimerIntClear(TIMER2_BASE, TIMER_TIMA_TIMEOUT);
     
     pulseCount++;
@@ -277,9 +273,8 @@ Timer2IntHandler(void)
     }
     
     TimerLoadSet(TIMER2_BASE, TIMER_A, (SysCtlClockGet()/pulseFreq)/2-1);
-    //
+
     // Update PR Flag
-    //
     if(g_ulFlagPR==0){
       g_ulFlagPR=1;
     }
@@ -296,65 +291,61 @@ Timer2IntHandler(void)
 void
 SysTickIntHandler(void)
 {
-    unsigned long ulData, ulDelta;
+  unsigned long ulData, ulDelta;
 
-    // Indicate that a timer interrupt has occurred.
-    HWREGBITW(&g_ulFlags, FLAG_CLOCK_TICK) = 1;
-    // only check buttons if there is not a button pressed
-    if(!HWREGBITW(&g_ulFlags, FLAG_BUTTON_PRESS)){
-        // Read the state of the push buttons.
-        ulData = (GPIOPinRead(GPIO_PORTE_BASE, (GPIO_PIN_0 | GPIO_PIN_1 |
-                                                GPIO_PIN_2 | GPIO_PIN_3)) |
-                  (GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_1) << 3));
+  // Indicate that a timer interrupt has occurred.
+  HWREGBITW(&g_ulFlags, FLAG_CLOCK_TICK) = 1;
+  // only check buttons if there is not a button pressed
+  if(!HWREGBITW(&g_ulFlags, FLAG_BUTTON_PRESS)){
+    // Read the state of the push buttons.
+    ulData = (GPIOPinRead(GPIO_PORTE_BASE, (GPIO_PIN_0 | GPIO_PIN_1 |
+                                            GPIO_PIN_2 | GPIO_PIN_3)) |
+              (GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_1) << 3));
+
+    // Determine the switches that are at a different state than the debounced state.
+    //debug line to imitate up click
+    ulDelta = ulData ^ g_ucSwitches;
+
+    // Increment the clocks by one.
+    // Exclusive or of clock B If a bit is different in A and B then 1 if the bits have the same value = 0
+    g_ucSwitchClockA ^= g_ucSwitchClockB;
     
-        // Determine the switches that are at a different state than the debounced state.
-        //debug line to imitate up click
-        //ulData = 30;
-        ulDelta = ulData ^ g_ucSwitches;
-    
-        // Increment the clocks by one.
-        // Exclusive or of clock B If a bit is different in A and B then 1 if the bits have the same value = 0
-        g_ucSwitchClockA ^= g_ucSwitchClockB;
-        
-        // Compliment of clock B. This changes 1 to 0 and 0 to 1 bitwise
-        g_ucSwitchClockB = ~g_ucSwitchClockB;
-    
-        // Reset the clocks corresponding to switches that have not changed state.
-        g_ucSwitchClockA &= ulDelta;
-        g_ucSwitchClockB &= ulDelta;
-    
-        // Get the new debounced switch state.
-        g_ucSwitches &= g_ucSwitchClockA | g_ucSwitchClockB;
-        g_ucSwitches |= (~(g_ucSwitchClockA | g_ucSwitchClockB)) & ulData;
-    
-        // Determine the switches that just changed debounced state.
-        ulDelta ^= (g_ucSwitchClockA | g_ucSwitchClockB);
-    
-        
-    
-        // See if the select button was  pressed during an alarm.
-        if(g_ucSwitches==15 && auralFlag==1)
-        {
-            
-            // Set a flag to indicate that the select button was just pressed.
-            //HWREGBITW(&g_ulFlags, FLAG_BUTTON_PRESS) = 1;
-            PWMGenDisable(PWM_BASE, PWM_GEN_0);
-            auralFlag = 0;
-            auralCounter = globalCounter;
-        }
-        // See if any switches just changed debounced state.
-        if(ulDelta && (g_ucSwitches != 0x1F))
-        {
-            // You can watch the variable for ulDelta
-            // Up = 1 Right = 8 down =2 left =4  select = 16 Bit values
-    
-            printf("A button was pressed %d \n", ulDelta);
-            printf("SwitchesState %d \n", g_ucSwitches);
-            HWREGBITW(&g_ulFlags, FLAG_BUTTON_PRESS) = 1;
-        }
+    // Compliment of clock B. This changes 1 to 0 and 0 to 1 bitwise
+    g_ucSwitchClockB = ~g_ucSwitchClockB;
+
+    // Reset the clocks corresponding to switches that have not changed state.
+    g_ucSwitchClockA &= ulDelta;
+    g_ucSwitchClockB &= ulDelta;
+
+    // Get the new debounced switch state.
+    g_ucSwitches &= g_ucSwitchClockA | g_ucSwitchClockB;
+    g_ucSwitches |= (~(g_ucSwitchClockA | g_ucSwitchClockB)) & ulData;
+
+    // Determine the switches that just changed debounced state.
+    ulDelta ^= (g_ucSwitchClockA | g_ucSwitchClockB);
+
+    // See if the select button was  pressed during an alarm.
+    if(g_ucSwitches==15 && auralFlag==1)
+    {
+        // Set a flag to indicate that the select button was just pressed.
+        PWMGenDisable(PWM_BASE, PWM_GEN_0);
+        auralFlag = 0;
+        auralCounter = globalCounter;
     }
+    // See if any switches just changed debounced state.
+    if(ulDelta && (g_ucSwitches != 0x1F))
+    {
+        // You can watch the variable for ulDelta
+        // Up = 1 Right = 8 down =2 left =4  select = 16 Bit values
+        //printf("A button was pressed %d \n", ulDelta);
+        //printf("SwitchesState %d \n", g_ucSwitches);
+        HWREGBITW(&g_ulFlags, FLAG_BUTTON_PRESS) = 1;
+    }
+  }
 }
 
+
+// Main
  void main(void)
 {  
   // Initialize the OLED display.
@@ -364,114 +355,25 @@ SysTickIntHandler(void)
   schedule(&schedPtrs);
           
   return;
-
 }
 
-
+// Scheduler schedules tasks and handles them
 void schedule(void* data)
 {
   // Counter to track the last time all tasks finished
   int previousCount = 0;
+  
+  // Initialize flags
   auralFlag = 0;
   computeFlag = 1;
   serialFlag = 0;
+ 
+  // Flag to determine end of queue
   int queueEnd = 0;
   
-  unsigned long ulPeriod;
-  unsigned long ulPeriodPR;
-    
-  // Set the clocking to run directly from the crystal.
-  SysCtlClockSet(SYSCTL_SYSDIV_1 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
-                 SYSCTL_XTAL_8MHZ);
-  
-  g_ulSystemClock = SysCtlClockGet();
-
-  // Enable the peripherals used by this example.
-  SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
-  SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER2); 
-  SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
-  SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
-  SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
-  SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
-  SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-  SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOG);
-  SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM);
-  SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
-  
-  // Configure the GPIO used to output the state of the led
-  GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_0);
-
-  //**INITIALIZE BUTTONS**//
-  // Configure the GPIOs used to read the state of the on-board push buttons.
-  GPIOPinTypeGPIOInput(GPIO_PORTE_BASE,
-                       GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3);
-  GPIOPadConfigSet(GPIO_PORTE_BASE,
-                   GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3,
-                   GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
-  GPIOPinTypeGPIOInput(GPIO_PORTF_BASE, GPIO_PIN_1);
-  GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_STRENGTH_2MA,
-                   GPIO_PIN_TYPE_STD_WPU);
-  GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0);
-
-  // Configure SysTick to periodically interrupt.
-  SysTickPeriodSet(g_ulSystemClock / CLOCK_RATE);
-  SysTickIntEnable();
-  SysTickEnable();
-  
-  //**INITIALIZE UART**//
-  // Configure the GPIO for the UART
-  GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-     
-  // Set the configuration of the UART
-  UARTConfigSetExpClk(UART0_BASE, SysCtlClockGet(), 460800,
-                        (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
-                         UART_CONFIG_PAR_NONE));
-	
-  ulPeriodPR =(SysCtlClockGet()/4)/2 ;
-  //**INITIALIZE TIMER INTERRUPT**//
-  // Configure the 32-bit periodic timer.
-  TimerConfigure(TIMER0_BASE, TIMER_CFG_32_BIT_PER);
-  TimerConfigure(TIMER2_BASE, TIMER_CFG_32_BIT_PER);
-  TimerLoadSet(TIMER0_BASE, TIMER_A, SysCtlClockGet()/10);
-  TimerLoadSet(TIMER2_BASE, TIMER_A, ulPeriodPR-1);
-
-  // Setup the interrupt for the timer timeout.
-  IntEnable(INT_TIMER0A);
-  IntEnable(INT_TIMER2A);
-  
-  TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
-  TimerIntEnable(TIMER2_BASE, TIMER_TIMA_TIMEOUT);
-  
-  // Enable the timer.
-  TimerEnable(TIMER0_BASE, TIMER_A);
-  TimerEnable(TIMER2_BASE, TIMER_A);
-  
-  	
-
-  //**INITIAL SOUND WARNING**//
-  // Set GPIO G1 as PWM pin.  They are used to output the PWM1 signal.
-  GPIOPinTypePWM(GPIO_PORTG_BASE, GPIO_PIN_1);
-  
-  // Compute the PWM period based on the system clock.
-  ulPeriod = SysCtlClockGet() / 440;
-  
-  // Set the PWM period to 440 (A) Hz.
-  PWMGenConfigure(PWM_BASE, PWM_GEN_0,
-                    PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
-  PWMGenPeriodSet(PWM_BASE, PWM_GEN_0, ulPeriod);
-
-  // PWM1 to a duty cycle of 75%.
-  PWMPulseWidthSet(PWM_BASE, PWM_OUT_1, ulPeriod * 3 / 4);
-
-  // Enable the PWM1 output signal.
-  PWMOutputState(PWM_BASE,PWM_OUT_1_BIT, true);
-  
-  // Enable processor interrupts.
-  IntMasterEnable();
-  
-  // Turn on LED to indicate normal state
-  enableVisibleAnnunciation();
-        
+  // Initializes clock, timers, and interupts
+  startup();
+      
   //  Declare some TCBs 
   TCB displayT;
   TCB measureT;
@@ -599,6 +501,110 @@ void schedule(void* data)
   }          
 }
 
+
+/*
+Function startup
+Input: NULL
+Output: Null
+Do: Initializes clocks, timers, and interrupts
+*/
+
+void startup()
+{
+  // Variables used for configurations
+  unsigned long ulPeriod;
+  unsigned long ulPeriodPR;
+    
+  // Set the clocking to run directly from the crystal.
+  SysCtlClockSet(SYSCTL_SYSDIV_1 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
+                 SYSCTL_XTAL_8MHZ);
+  
+  g_ulSystemClock = SysCtlClockGet();
+
+  // Enable the peripherals used by this example.
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER2); 
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOG);
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM);
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+  
+  // Configure the GPIO used to output the state of the led
+  GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_0);
+
+  //**INITIALIZE BUTTONS**//
+  // Configure the GPIOs used to read the state of the on-board push buttons.
+  GPIOPinTypeGPIOInput(GPIO_PORTE_BASE,
+                       GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3);
+  GPIOPadConfigSet(GPIO_PORTE_BASE,
+                   GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3,
+                   GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+  GPIOPinTypeGPIOInput(GPIO_PORTF_BASE, GPIO_PIN_1);
+  GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_STRENGTH_2MA,
+                   GPIO_PIN_TYPE_STD_WPU);
+  GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0);
+
+  // Configure SysTick to periodically interrupt.
+  SysTickPeriodSet(g_ulSystemClock / CLOCK_RATE);
+  SysTickIntEnable();
+  SysTickEnable();
+  
+  //**INITIALIZE UART**//
+  // Configure the GPIO for the UART
+  GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+     
+  // Set the configuration of the UART
+  UARTConfigSetExpClk(UART0_BASE, SysCtlClockGet(), 460800,
+                        (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
+                         UART_CONFIG_PAR_NONE));
+	
+  ulPeriodPR =(SysCtlClockGet()/4)/2 ;
+  //**INITIALIZE TIMER INTERRUPT**//
+  // Configure the 32-bit periodic timer.
+  TimerConfigure(TIMER0_BASE, TIMER_CFG_32_BIT_PER);
+  TimerConfigure(TIMER2_BASE, TIMER_CFG_32_BIT_PER);
+  TimerLoadSet(TIMER0_BASE, TIMER_A, SysCtlClockGet()/10);
+  TimerLoadSet(TIMER2_BASE, TIMER_A, ulPeriodPR-1);
+
+  // Setup the interrupt for the timer timeout.
+  IntEnable(INT_TIMER0A);
+  IntEnable(INT_TIMER2A);
+  
+  TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+  TimerIntEnable(TIMER2_BASE, TIMER_TIMA_TIMEOUT);
+  
+  // Enable the timer.
+  TimerEnable(TIMER0_BASE, TIMER_A);
+  TimerEnable(TIMER2_BASE, TIMER_A);
+  
+  //**INITIAL SOUND WARNING**//
+  // Set GPIO G1 as PWM pin.  They are used to output the PWM1 signal.
+  GPIOPinTypePWM(GPIO_PORTG_BASE, GPIO_PIN_1);
+  
+  // Compute the PWM period based on the system clock.
+  ulPeriod = SysCtlClockGet() / 440;
+  
+  // Set the PWM period to 440 (A) Hz.
+  PWMGenConfigure(PWM_BASE, PWM_GEN_0,
+                    PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
+  PWMGenPeriodSet(PWM_BASE, PWM_GEN_0, ulPeriod);
+
+  // PWM1 to a duty cycle of 75%.
+  PWMPulseWidthSet(PWM_BASE, PWM_OUT_1, ulPeriod * 3 / 4);
+
+  // Enable the PWM1 output signal.
+  PWMOutputState(PWM_BASE,PWM_OUT_1_BIT, true);
+  
+  // Enable processor interrupts.
+  IntMasterEnable();
+  
+  // Turn on LED to indicate normal state
+  enableVisibleAnnunciation();
+}
 /*
 Function add
 Input: A node from the linked list
@@ -672,9 +678,12 @@ void delet(struct MyStruct* node)
   return;
 }
 
-void buttonTest(){
+// Task times
+// Measure: 16.000000 
+// Warning: 17.000000 
+// SerialComm: 17.000000
+// Status: 16.000000 
+// Compute: 16.000000 
+// Display: 16.000000 
+// Keypad: 16.000000 
 
-    // Throw away any button presses that may have occurred while the splash
-    // screens were being displayed.
-    HWREGBITW(&g_ulFlags, FLAG_BUTTON_PRESS) = 0;
-};

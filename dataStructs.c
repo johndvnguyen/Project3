@@ -40,6 +40,7 @@ typedef struct
 }alarms;
 #define INIT_ALARMS(X) alarms X ={'\0','\0','\0'};
 
+// Datastruct for warnings/alarms
 typedef struct 
 {
   Bool bpHigh;
@@ -54,6 +55,7 @@ typedef struct
 }warning;
 #define INIT_WARNING(X) warning X={FALSE,FALSE,FALSE,0,0,20,10,5,0};
 
+// Datastruct for scheduler
 typedef struct{
   unsigned int globalCounter;
 }scheduler;
@@ -69,6 +71,7 @@ typedef struct{
 }keypad;
 #define INIT_KEYPAD(X) keypad X={0,0,0,1,0};
 
+// Struct for TCB's
 typedef struct MyStruct 
 {
     void (*taskPtr)(void*);

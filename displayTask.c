@@ -7,6 +7,12 @@
 
 extern unsigned char g_ucSwitches;
 
+/*
+Function disp
+Input display data
+Output Information to OLED
+Do: Determines which menu to display
+*/
 void disp(void* data)
 {  
     displayData2 * dData = (displayData2*)data;
@@ -16,7 +22,6 @@ void disp(void* data)
     {
       RIT128x96x4Clear();
       mainDisp();
-      //*dData->modePtr = 1;
     }
     // If mode is 1, display menu
     else if(*(dData->modePtr) == 1)
@@ -24,23 +29,24 @@ void disp(void* data)
       RIT128x96x4Clear();
       
       menuDisp(data);
-      //*dData->modePtr = 2;
     }
     // If mode is 2, display annunciation menu
     else if(*(dData->modePtr) == 2)
     {
-      RIT128x96x4Clear();
-      
+      RIT128x96x4Clear(); 
       annunciateDisp(data);
-      //*dData->modePtr = 0;
     }
-    
     return;
 }
 
+/*
+Function annunciateDisp
+Input display annunciate information
+Output Information to OLED
+Do: Displays annunciation information
+*/
 void annunciateDisp(void* data)
 {
-  //printf("\n CHECKING DISPLAY! \n");
   displayData2 * dData = (displayData2*)data;
   
   //find the current index of the array based on call count. 
@@ -108,8 +114,7 @@ void annunciateDisp(void* data)
   {
     usprintf(pulseOut,"");
   }
-
-  
+ 
   // Update OLED screen to show new values
   RIT128x96x4StringDraw(temp,5,9,15);
   RIT128x96x4StringDraw(bP,5,20,15);
@@ -118,29 +123,35 @@ void annunciateDisp(void* data)
   RIT128x96x4StringDraw(tempOut,5,40,15);
   RIT128x96x4StringDraw(bpOut,5,50,15);
   RIT128x96x4StringDraw(pulseOut,5,60,15);
-  
-
+ 
   return; 
 }
 
+/*
+Function menuDisp
+Input display menu information
+Output Information to OLED
+Do: Displays menu information
+*/
 void mainDisp()
 {
   char menu[20];
-  //sprintf(temp,"Temp %d C",tempCorrect);
   usprintf(menu,"Menu");
   
-  
   char annun[20];
-  //sprintf(temp,"Temp %d C",tempCorrect);
   usprintf(annun,"Annunciate");
  
   // Update OLED screen to show new values
   RIT128x96x4StringDraw(menu,10,9,15);
-  
   RIT128x96x4StringDraw(annun,10,20,15);
-  
 }
 
+/*
+Function menuDisp
+Input display menu information
+Output Information to OLED
+Do: Displays menu information
+*/
 void menuDisp()
 {
   char bp[20];
@@ -152,12 +163,8 @@ void menuDisp()
   char pulse[20];
   usprintf(pulse,"Pulse Rate");
   
- // char back[20];
- // usprintf(back,"Go Back");
- 
-  // Update OLED screen to show new values
+ // Update OLED screen to show new values
   RIT128x96x4StringDraw(bp,10,9,15);
   RIT128x96x4StringDraw(temp,10,20,15);
   RIT128x96x4StringDraw(pulse,10,30,15);
- // RIT128x96x4StringDraw(back,10,40,15);
 }

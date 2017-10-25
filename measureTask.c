@@ -12,17 +12,10 @@ void measure(void* data)
     measureData2 * measureDataPtr = (measureData2*) data;
     
     measureTempArray(data);
-    
     measureSysBPArray(data);
-    
     measureDiaBPArray(data);
-    
-
-    
     measurePRArray(data);
-    
 
-    
     //Moved this to after the measurements so we start at index 0
     //increment the count entry
     ++(*(*measureDataPtr).countCallsPtr);
@@ -163,7 +156,7 @@ void measurePRArray(void* data){
     measureData2* measureDataPtr = (measureData2*) data;
     unsigned int clock = globalCounter;//(*measureDataPtr).globalCounterPtr;
     unsigned int temp=clock;
-    while(clock<(temp+10)){
+    while(clock<(temp+1)){
         
         clock=globalCounter;//(*measureDataPtr).globalCounterPtr;
         unsigned long* beat=(*measureDataPtr).prPtr;
