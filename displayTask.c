@@ -151,9 +151,13 @@ void menuDisp()
   
   char pulse[20];
   usprintf(pulse,"Pulse Rate");
+  
+ // char back[20];
+ // usprintf(back,"Go Back");
  
   // Update OLED screen to show new values
-  RIT128x96x4StringDraw(bp,5,9,15);
-  RIT128x96x4StringDraw(temp,5,20,15);
-  RIT128x96x4StringDraw(pulse,5,30,15);
+  RIT128x96x4StringDraw(bp,10,9,15);
+  RIT128x96x4StringDraw(temp,10,20,15);
+  RIT128x96x4StringDraw(pulse,10,30,15);
+ // RIT128x96x4StringDraw(back,10,40,15);
 }

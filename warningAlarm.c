@@ -133,6 +133,7 @@ void auralAnnunciate(void *data)
   warningAlarmData2 * alarm = (warningAlarmData2*) data;
   if((*(alarm->tempHighPtr)) || (*(alarm->pulseLowPtr)) || (*(alarm->bpHighPtr)))
   {
+    // updated from 50 to 5000 to test without alarms going off
     if(auralFlag == 0 && (globalCounter - auralCounter >= 50))
     {
       auralFlag = 1;
