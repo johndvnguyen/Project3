@@ -9,21 +9,30 @@ void disp(void* data)
 {  
     displayData2 * dData = (displayData2*)data;
     
-    // If mode is 0, display menu
+    // If mode is 0, display main
     if(*(dData->modePtr) == 0)
     {
       RIT128x96x4Clear();
-      menuDisp();
+      mainDisp();
       *dData->modePtr = 1;
     }
-    // If mode is 1, display annunciation menu
+    // If mode is 1, display menu
     else if(*(dData->modePtr) == 1)
+    {
+      RIT128x96x4Clear();
+      
+      menuDisp(data);
+      *dData->modePtr = 2;
+    }
+    // If mode is 2, display annunciation menu
+    else if(*(dData->modePtr) == 2)
     {
       RIT128x96x4Clear();
       
       annunciateDisp(data);
       *dData->modePtr = 0;
     }
+    
     return;
 }
 
@@ -112,7 +121,7 @@ void annunciateDisp(void* data)
   return; 
 }
 
-void menuDisp()
+void mainDisp()
 {
   char menu[20];
   //sprintf(temp,"Temp %d C",tempCorrect);
@@ -125,4 +134,21 @@ void menuDisp()
   // Update OLED screen to show new values
   RIT128x96x4StringDraw(menu,5,9,15);
   RIT128x96x4StringDraw(annun,5,20,15);
+}
+
+void menuDisp()
+{
+  char bp[20];
+  usprintf(bp,"Blood Pressure");
+  
+  char temp[20];
+  usprintf(temp,"Temperature");
+  
+  char pulse[20];
+  usprintf(pulse,"Pulse Rate");
+ 
+  // Update OLED screen to show new values
+  RIT128x96x4StringDraw(bp,5,9,15);
+  RIT128x96x4StringDraw(temp,5,20,15);
+  RIT128x96x4StringDraw(pulse,5,30,15);
 }

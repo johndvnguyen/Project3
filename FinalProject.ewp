@@ -1661,6 +1661,9 @@
     <name>$PROJ_DIR$\..\..\..\driverlib\ewarm\Exe\driverlib.a</name>
   </file>
   <file>
+    <name>$PROJ_DIR$\Flags.h</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\main.c</name>
   </file>
   <file>
@@ -1677,6 +1680,12 @@
   </file>
   <file>
     <name>$PROJ_DIR$\..\drivers\rit128x96x4.h</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\serialComTask.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\serialComTask.h</name>
   </file>
   <file>
     <name>$PROJ_DIR$\..\hello\startup_ewarm.c</name>

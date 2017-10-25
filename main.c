@@ -16,12 +16,15 @@
 #include "inc/hw_memmap.h"
 #include "inc/lm3s8962.h"
 #include "measureTask.h"
+#include "serialComTask.h"
 #include "systemTimeBase.h"
 #include "warningAlarm.h"
-#include "serialComTask.h"
+#include "Flags.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define CLOCK_RATE              300
 
@@ -127,6 +130,7 @@ struct MyStruct* tail=NULL;
 void delet(struct MyStruct* node);
 
 unsigned volatile int globalCounter = 0;
+unsigned int auralCounter = 0;
 //*****************************************************************************
 //
 // Flags that contain the current value of the interrupt indicator as displayed
@@ -134,6 +138,7 @@ unsigned volatile int globalCounter = 0;
 //
 //*****************************************************************************
 unsigned long g_ulFlags;
+unsigned long auralFlag;
 
 
 
@@ -277,17 +282,17 @@ SysTickIntHandler(void)
     // See if the select button was just pressed.
     if((ulDelta & 0x10) && !(g_ucSwitches & 0x10))
     {
+        
         // Set a flag to indicate that the select button was just pressed.
         HWREGBITW(&g_ulFlags, FLAG_BUTTON_PRESS) = 1;
-        //PWMGenDisable(PWM_BASE, PWM_GEN_0);
+        PWMGenDisable(PWM_BASE, PWM_GEN_0);
+        auralFlag = 0;
+        auralCounter = globalCounter;
     }
 }
 
  void main(void)
 {  
-  // Turn on LED to indicate normal state
-  enableVisibleAnnunciation();
-  
   // Initialize the OLED display.
   RIT128x96x4Init(1000000);
   
@@ -303,36 +308,91 @@ void schedule(void* data)
 {
   // Counter to track the last time all tasks finished
   int previousCount = 0;
+  auralFlag = 0;
+  
+  unsigned long ulPeriod;
     
   // Set the clocking to run directly from the crystal.
   SysCtlClockSet(SYSCTL_SYSDIV_1 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
                  SYSCTL_XTAL_8MHZ);
+  
+  g_ulSystemClock = SysCtlClockGet();
 
   // Enable the peripherals used by this example.
   SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
   SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
   SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
- 
-
-  // Enable processor interrupts.
-  IntMasterEnable();
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOG);
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM);
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
   
+  // Configure the GPIO used to output the state of the led
+  GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_0);
+
+  //**INITIALIZE BUTTONS**//
+  // Configure the GPIOs used to read the state of the on-board push buttons.
+  GPIOPinTypeGPIOInput(GPIO_PORTE_BASE,
+                       GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3);
+  GPIOPadConfigSet(GPIO_PORTE_BASE,
+                   GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3,
+                   GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+  GPIOPinTypeGPIOInput(GPIO_PORTF_BASE, GPIO_PIN_1);
+  GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_STRENGTH_2MA,
+                   GPIO_PIN_TYPE_STD_WPU);
+  GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0);
+
+  // Configure SysTick to periodically interrupt.
+  SysTickPeriodSet(g_ulSystemClock / CLOCK_RATE);
+  SysTickIntEnable();
+  SysTickEnable();
+  
+  //**INITIALIZE UART**//
+  // Configure the GPIO for the UART
   GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
      
+  // Set the configuration of the UART
   UARTConfigSetExpClk(UART0_BASE, SysCtlClockGet(), 460800,
                         (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
                          UART_CONFIG_PAR_NONE));
 	
-  // Configure the two 32-bit periodic timers.
+  //**INITIALIZE TIMER INTERRUPT**//
+  // Configure the 32-bit periodic timer.
   TimerConfigure(TIMER0_BASE, TIMER_CFG_32_BIT_PER);
   TimerLoadSet(TIMER0_BASE, TIMER_A, SysCtlClockGet()/10);
 
-  // Setup the interrupts for the timer timeouts.
+  // Setup the interrupt for the timer timeout.
   IntEnable(INT_TIMER0A);
   TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
 
-  // Enable the timers.
+  // Enable the timer.
   TimerEnable(TIMER0_BASE, TIMER_A);
+  
+  //**INITIAL SOUND WARNING**//
+  // Set GPIO G1 as PWM pin.  They are used to output the PWM1 signal.
+  GPIOPinTypePWM(GPIO_PORTG_BASE, GPIO_PIN_1);
+  
+  // Compute the PWM period based on the system clock.
+  ulPeriod = SysCtlClockGet() / 440;
+  
+  // Set the PWM period to 440 (A) Hz.
+  PWMGenConfigure(PWM_BASE, PWM_GEN_0,
+                    PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
+  PWMGenPeriodSet(PWM_BASE, PWM_GEN_0, ulPeriod);
+
+  // PWM1 to a duty cycle of 75%.
+  PWMPulseWidthSet(PWM_BASE, PWM_OUT_1, ulPeriod * 3 / 4);
+
+  // Enable the PWM1 output signal.
+  PWMOutputState(PWM_BASE,PWM_OUT_1_BIT, true);
+  
+  // Enable processor interrupts.
+  IntMasterEnable();
+  
+  // Turn on LED to indicate normal state
+  enableVisibleAnnunciation();
         
   //  Declare some TCBs 
   TCB displayT;
@@ -341,7 +401,6 @@ void schedule(void* data)
   TCB computeT;
   TCB warningT;
   TCB serialComT;
-  
   
   //  Declare a working TCB pointer
   TCB* aTCBPtr;
@@ -362,7 +421,6 @@ void schedule(void* data)
   warningT.taskPtr = alarm;
   warningT.taskDataPtr = (void*)&wPtrs2;
 	
-  
   serialComT.taskPtr= communicate;
   serialComT.taskDataPtr= (void*)&comPtrs;
   
@@ -396,7 +454,17 @@ void schedule(void* data)
     if(!(NULL==head))
     {
       aTCBPtr = head;
+      
+      // Begin measurement to empirically measure task
+      //clock_t begin = clock();
       aTCBPtr->taskPtr((aTCBPtr->taskDataPtr) );
+      
+      // End measurement to emprically measure task
+      //clock_t end = clock();
+      
+      // Find the task time
+      //double time_spent = (double) (end - begin) / CLOCKS_PER_SEC;
+      //printf("%f \n\n", time_spent);
       delet(head);
     
       if(NULL == head)
@@ -464,35 +532,6 @@ void delet(struct MyStruct* node)
 }
 
 void buttonTest(){
-    
-    // Get the system clock speed.
-    g_ulSystemClock = SysCtlClockGet();
-
-    // Enable the peripherals used by the application.
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOG);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
-
-    // Configure the GPIOs used to read the state of the on-board push buttons.
-    GPIOPinTypeGPIOInput(GPIO_PORTE_BASE,
-                         GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3);
-    GPIOPadConfigSet(GPIO_PORTE_BASE,
-                     GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3,
-                     GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
-    GPIOPinTypeGPIOInput(GPIO_PORTF_BASE, GPIO_PIN_1);
-    GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_STRENGTH_2MA,
-                     GPIO_PIN_TYPE_STD_WPU);
-
-    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_0, 0);
-
-    // Configure SysTick to periodically interrupt.
-    SysTickPeriodSet(g_ulSystemClock / CLOCK_RATE);
-    SysTickIntEnable();
-    SysTickEnable();
 
     // Throw away any button presses that may have occurred while the splash
     // screens were being displayed.

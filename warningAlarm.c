@@ -17,7 +17,7 @@ Code to enable and disable light referenced from Blinky.c from StellarisWare exa
 #include "driverlib/gpio.h"
 #include "driverlib/pwm.h"
 #include "driverlib/sysctl.h"
-
+#include "Flags.h"
 
 /*
 Function alarm
@@ -27,46 +27,9 @@ Do: Checks if vitals are out of range
 */
 void alarm(void *data)
 {
-  unsigned long ulPeriod;
-  //**********************************************
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOG);
-    
-    // Set GPIO F0 and G1 as PWM pins.  They are used to output the PWM0 and
-    // PWM1 signals.
-    //
-    GPIOPinTypePWM(GPIO_PORTF_BASE, GPIO_PIN_0);
-    GPIOPinTypePWM(GPIO_PORTG_BASE, GPIO_PIN_1);
-    
-    // Compute the PWM period based on the system clock.
-    //
-    ulPeriod = SysCtlClockGet() / 440;
-    
-    // Set the PWM period to 440 (A) Hz.
-    //
-    PWMGenConfigure(PWM_BASE, PWM_GEN_0,
-                    PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
-    PWMGenPeriodSet(PWM_BASE, PWM_GEN_0, ulPeriod);
-
-    //
-    // Set PWM0 to a duty cycle of 25% and PWM1 to a duty cycle of 75%.
-    //
-    PWMPulseWidthSet(PWM_BASE, PWM_OUT_0, ulPeriod / 4);
-    PWMPulseWidthSet(PWM_BASE, PWM_OUT_1, ulPeriod * 3 / 4);
-
-    //
-    // Enable the PWM0 and PWM1 output signals.
-    //
-    PWMOutputState(PWM_BASE, PWM_OUT_0_BIT | PWM_OUT_1_BIT, true);
-
-    //PWMGenEnable(PWM_BASE, PWM_GEN_0);
-    //**********************************************
-    //printf("\n CHECKING WARNINGS! \n");
-    //warningAlarmData * alarm = (warningAlarmData*) data;
-    checkWarnings(data);
-    annunciate(data);
-
+  checkWarnings(data);
+  annunciate(data);
+  auralAnnunciate(data);
 }
 
 /*
@@ -82,12 +45,10 @@ void checkWarnings(void *data)
   
   //find the current index of the array based on call count. 
   unsigned int index = ((*(alarm->countCallsPtr)) % 8);
-  //printf("Index main: %i \n\n", index);
   
   unsigned int* tempBuf = (*alarm).temperatureRawBufPtr;
   unsigned int* bpBuf = (*alarm).bloodPressRawBufPtr;
   unsigned int* pulseBuf = (*alarm).pulseRateRawBufPtr;
-  //unsigned short* battery = (*alarm).batteryStatePtr;
   unsigned char* bpOut = (*alarm).bpOutOfRangePtr;
   unsigned char* tempOut = (*alarm).tempOutOfRangePtr;
   unsigned char* pulseOut = (*alarm).pulseOutOfRangePtr;
@@ -97,9 +58,9 @@ void checkWarnings(void *data)
 
   // Check vitals against prescribed ranges. Set warnings accordingly
   checkTemp(tempBuf, tempHigh, index, tempOut);
-
   checkBp(bpBuf, bpHigh, index, bpOut);
   checkPulse(pulseBuf, pulseLow, index, pulseOut);
+  return;
 }
 
 
@@ -112,12 +73,9 @@ Do: Checks if values are within normal range and sets bool accordingly.
 */
 void checkTemp(unsigned int* temp, Bool* tempHigh, int index, unsigned char* tempOut)
 {
-  //printf("checkTemp: %i \n", temp[index]);
   // Check if temperature is in range. Set warning accordingly
-  //printf("Index: %i \n\n", index);
   if((temp[index]) < 41.46 || (temp[index]) > 43.73)
   {
-    //printf("\n\n temp index: %i \n\n", temp[index]);
     *tempHigh = TRUE;
     *tempOut = 89;
   } 
@@ -125,8 +83,7 @@ void checkTemp(unsigned int* temp, Bool* tempHigh, int index, unsigned char* tem
   {
     *tempHigh = FALSE;
     *tempOut = 78;
-  }
-  
+  } 
 }
 
 /*
@@ -158,7 +115,6 @@ Do: Checks if values are within normal range and sets bool accordingly.
 */
 void checkPulse(unsigned int* pulse, Bool* pulseLow, int index, unsigned char* pulseOut)
 {
-  //printf("Here: %i\n", 1);
   // Check if pulse rate is in range. Set warning accordingly.
   if ((int)(*pulse) < 60)
   {
@@ -172,6 +128,28 @@ void checkPulse(unsigned int* pulse, Bool* pulseLow, int index, unsigned char* p
   }
 }
 
+void auralAnnunciate(void *data)
+{
+  warningAlarmData2 * alarm = (warningAlarmData2*) data;
+  if((*(alarm->tempHighPtr)) || (*(alarm->pulseLowPtr)) || (*(alarm->bpHighPtr)))
+  {
+    if(auralFlag == 0 && (globalCounter - auralCounter >= 50))
+    {
+      auralFlag = 1;
+      PWMGenEnable(PWM_BASE, PWM_GEN_0);
+    }
+  } 
+  
+  else
+  {
+    if(auralFlag == 1)
+    {
+      auralFlag = 0;
+      PWMGenDisable(PWM_BASE, PWM_GEN_0);
+    }
+  }
+  
+}
 /*
 Function: annunciate
 Input: warning data
@@ -194,7 +172,7 @@ void annunciate(void *data)
         {
           
           (*previousCount) = globalCounter;
-          printf("PREVIOUS COUNT: %i \n", (*previousCount));
+          //printf("PREVIOUS COUNT: %i \n", (*previousCount));
           //printf("PULSELOW LED \n\n");
           if((*led) == 1)
           {
@@ -215,7 +193,7 @@ void annunciate(void *data)
         if(globalCounter - (*previousCount) >= tempFlash)
         { 
           (*previousCount) = globalCounter;
-          printf("PREVIOUS COUNT: %i \n", (*previousCount));
+          //printf("PREVIOUS COUNT: %i \n", (*previousCount));
           //printf("TEMPHIGH LED \n\n");
           if((*led) == 1)
           {
@@ -259,16 +237,7 @@ Do: Turns on LED on StellarisWare board
 */
 void enableVisibleAnnunciation()
 {
-  // Enable the GPIO port that is used for the on-board LED.
-  SYSCTL_RCGC2_R = SYSCTL_RCGC2_GPIOF;
-
-  // Enable the GPIO pin for the LED (PF0).  Set the direction as output, and
-  // enable the GPIO pin for digital function.
-  GPIO_PORTF_DIR_R = 0x01;
-  GPIO_PORTF_DEN_R = 0x01;
-
-  // Turn on the LED.
-  GPIO_PORTF_DATA_R |= 0x01; 
+  GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_0, 0x01);
   return;
 }
 
@@ -281,13 +250,7 @@ Do: Turns off LED on StellarisWare board
 
 void disableVisibleAnnunciation()
 {
-  // Enable the GPIO pin for the LED (PF0).  Set the direction as output, and
-  // enable the GPIO pin for digital function. 
-  GPIO_PORTF_DIR_R = 0x01;
-  GPIO_PORTF_DEN_R = 0x01;
-
-  // Turn off the LED.
-  GPIO_PORTF_DATA_R &= ~(0x01);
+  GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_0, 0x00);
   return;
 }
 
