@@ -97,6 +97,16 @@ warningAlarmData2 wPtrs2=
   &w1.auralCount
 };
 
+keypadData kPtrs=
+{
+  &k1.mode,
+  &k1.measurementSelection,
+  &k1.scroll,
+  &k1.selectChoice,
+  &k1.alarmAcknowledge
+
+};
+
 statusData sPtrs=
 {  
   &s1.batteryState
@@ -123,6 +133,7 @@ void alarm(void* data);
 void disp(void* data);
 void schedule(void* data);
 void buttonTest();
+void keypadfunction(void* data);
 
 void insert(struct MyStruct* node);
 struct MyStruct* head=NULL;
@@ -241,53 +252,58 @@ SysTickIntHandler(void)
 
     // Indicate that a timer interrupt has occurred.
     HWREGBITW(&g_ulFlags, FLAG_CLOCK_TICK) = 1;
-
-    // Read the state of the push buttons.
-    ulData = (GPIOPinRead(GPIO_PORTE_BASE, (GPIO_PIN_0 | GPIO_PIN_1 |
-                                            GPIO_PIN_2 | GPIO_PIN_3)) |
-              (GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_1) << 3));
-
-    // Determine the switches that are at a different state than the debounced state.
-    //debug line to imitate up click
-    //ulData = 30;
-    ulDelta = ulData ^ g_ucSwitches;
-
-    // Increment the clocks by one.
-    // Exclusive or of clock B If a bit is different in A and B then 1 if the bits have the same value = 0
-    g_ucSwitchClockA ^= g_ucSwitchClockB;
+    // only check buttons if there is not a button pressed
+    if(!HWREGBITW(&g_ulFlags, FLAG_BUTTON_PRESS)){
+        // Read the state of the push buttons.
+        ulData = (GPIOPinRead(GPIO_PORTE_BASE, (GPIO_PIN_0 | GPIO_PIN_1 |
+                                                GPIO_PIN_2 | GPIO_PIN_3)) |
+                  (GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_1) << 3));
     
-    // Compliment of clock B. This changes 1 to 0 and 0 to 1 bitwise
-    g_ucSwitchClockB = ~g_ucSwitchClockB;
-
-    // Reset the clocks corresponding to switches that have not changed state.
-    g_ucSwitchClockA &= ulDelta;
-    g_ucSwitchClockB &= ulDelta;
-
-    // Get the new debounced switch state.
-    g_ucSwitches &= g_ucSwitchClockA | g_ucSwitchClockB;
-    g_ucSwitches |= (~(g_ucSwitchClockA | g_ucSwitchClockB)) & ulData;
-
-    // Determine the switches that just changed debounced state.
-    ulDelta ^= (g_ucSwitchClockA | g_ucSwitchClockB);
-
-    // See if any switches just changed debounced state.
-    if(ulDelta)
-    {
-        // You can watch the variable for ulDelta
-        // Up = 1 Right = 8 down =2 left =4  select = 16 Bit values
-        // Add the current tick count to the entropy pool.
-        printf("A button was pressed %d \n", ulDelta);
-    }
-
-    // See if the select button was just pressed.
-    if((ulDelta & 0x10) && !(g_ucSwitches & 0x10))
-    {
+        // Determine the switches that are at a different state than the debounced state.
+        //debug line to imitate up click
+        //ulData = 30;
+        ulDelta = ulData ^ g_ucSwitches;
+    
+        // Increment the clocks by one.
+        // Exclusive or of clock B If a bit is different in A and B then 1 if the bits have the same value = 0
+        g_ucSwitchClockA ^= g_ucSwitchClockB;
         
-        // Set a flag to indicate that the select button was just pressed.
-        HWREGBITW(&g_ulFlags, FLAG_BUTTON_PRESS) = 1;
-        PWMGenDisable(PWM_BASE, PWM_GEN_0);
-        auralFlag = 0;
-        auralCounter = globalCounter;
+        // Compliment of clock B. This changes 1 to 0 and 0 to 1 bitwise
+        g_ucSwitchClockB = ~g_ucSwitchClockB;
+    
+        // Reset the clocks corresponding to switches that have not changed state.
+        g_ucSwitchClockA &= ulDelta;
+        g_ucSwitchClockB &= ulDelta;
+    
+        // Get the new debounced switch state.
+        g_ucSwitches &= g_ucSwitchClockA | g_ucSwitchClockB;
+        g_ucSwitches |= (~(g_ucSwitchClockA | g_ucSwitchClockB)) & ulData;
+    
+        // Determine the switches that just changed debounced state.
+        ulDelta ^= (g_ucSwitchClockA | g_ucSwitchClockB);
+    
+        
+    
+        // See if the select button was  pressed during an alarm.
+        if(g_ucSwitches==15 && auralFlag==1)
+        {
+            
+            // Set a flag to indicate that the select button was just pressed.
+            //HWREGBITW(&g_ulFlags, FLAG_BUTTON_PRESS) = 1;
+            PWMGenDisable(PWM_BASE, PWM_GEN_0);
+            auralFlag = 0;
+            auralCounter = globalCounter;
+        }
+        // See if any switches just changed debounced state.
+        else if(ulDelta && (g_ucSwitches != 0x1F))
+        {
+            // You can watch the variable for ulDelta
+            // Up = 1 Right = 8 down =2 left =4  select = 16 Bit values
+    
+            printf("A button was pressed %d \n", ulDelta);
+            printf("SwitchesState %d \n", g_ucSwitches);
+            HWREGBITW(&g_ulFlags, FLAG_BUTTON_PRESS) = 1;
+        }
     }
 }
 
@@ -401,6 +417,7 @@ void schedule(void* data)
   TCB computeT;
   TCB warningT;
   TCB serialComT;
+  TCB keypadT;
   
   //  Declare a working TCB pointer
   TCB* aTCBPtr;
@@ -420,6 +437,9 @@ void schedule(void* data)
 
   warningT.taskPtr = alarm;
   warningT.taskDataPtr = (void*)&wPtrs2;
+  
+  keypadT.taskPtr = keypadfunction;
+  keypadT.taskDataPtr = (void*)&kPtrs;
 	
   serialComT.taskPtr= communicate;
   serialComT.taskDataPtr= (void*)&comPtrs;
@@ -430,7 +450,9 @@ void schedule(void* data)
   insert(&statusT);
   insert(&computeT);
   insert(&displayT);
+  insert(&keypadT);
   insert(&serialComT);
+  
   //insert(&scheduleT);
 
   //Dispatch the tasks
@@ -444,6 +466,7 @@ void schedule(void* data)
       insert(&statusT);
       insert(&computeT);
       insert(&displayT);
+      insert(&keypadT);
       insert(&serialComT);
     }
         
@@ -470,7 +493,7 @@ void schedule(void* data)
       if(NULL == head)
         previousCount = globalCounter;
     }
-    buttonTest();
+   // buttonTest();
   }          
 }
 
