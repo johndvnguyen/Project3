@@ -9,6 +9,7 @@
 #include "drivers/rit128x96x4.h"
 #include "dataStructs.c"
 #include "dataPtrs.h"
+#include "Flags.h"
 
 void UARTSend(const unsigned char *pucBuffer, unsigned long ulCount)
 {
@@ -78,6 +79,9 @@ void communicate(void* data){
     UARTSend((unsigned char *)pulse, 10);
     UARTSend((unsigned char *)batt, 12);
   
+    // Set flag to delete task from queue
+    serialFlag = 2;
+    return;
 
 
 }

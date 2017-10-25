@@ -27,9 +27,17 @@ Do: Checks if vitals are out of range
 */
 void alarm(void *data)
 {
+  warningAlarmData2 * alarm = (warningAlarmData2*) data;
   checkWarnings(data);
   annunciate(data);
   auralAnnunciate(data);
+  
+   // Add serial to queue if warning has occurred
+  if((*(alarm->tempHighPtr)) || (*(alarm->pulseLowPtr)) || (*(alarm->bpHighPtr)))
+  {
+    serialFlag = 1;
+  }
+  return;
 }
 
 /*

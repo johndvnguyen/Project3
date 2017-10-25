@@ -3,5 +3,7 @@
 
 extern unsigned long auralFlag;
 extern unsigned int auralCounter;
+extern unsigned long computeFlag;
+extern unsigned long serialFlag;
 
 #endif
