@@ -18,8 +18,6 @@ void measure(void* data)
     measureDiaBPArray(data);
     
 
-    //measurePR(data);
-
     
     measurePRArray(data);
     
@@ -161,10 +159,11 @@ void measurePRArray(void* data){
  int check=0;
     int beatCount=0;
     int bpm=0;
+    int change =0;
     measureData2* measureDataPtr = (measureData2*) data;
     unsigned int clock = globalCounter;//(*measureDataPtr).globalCounterPtr;
     unsigned int temp=clock;
-    while(clock<temp+30){
+    while(clock<(temp+10)){
         
         clock=globalCounter;//(*measureDataPtr).globalCounterPtr;
         unsigned long* beat=(*measureDataPtr).prPtr;
@@ -181,14 +180,21 @@ void measurePRArray(void* data){
     bpm=(beatCount*60/3);
     
     unsigned int* countCalls = (*measureDataPtr).countCallsPtr;
-    unsigned int* bloodPressRawBuf = (*measureDataPtr).pulseRateRawBufPtr;
+    unsigned int* pulseRateRawBuf = (*measureDataPtr).pulseRateRawBufPtr;
     unsigned int prLast = (*countCalls) %8;
-    unsigned int prNext = (*countCalls+1) %8; 
-    
-    int change = ((bloodPressRawBuf[prLast]-bpm)*100)/(bloodPressRawBuf[prLast]);
-    
+    unsigned int prNext = (*countCalls+1) %8;
+    //Check to see if we prLast would cause divide by 0
+    if(pulseRateRawBuf[prLast]!=0){
+      change = ((pulseRateRawBuf[prLast]-bpm)*100)/(pulseRateRawBuf[prLast]);
+    }
+    //If the last value was 0, we shouuld have change be 0
+    //Each measurement does not currently have its own counter 
+    //so the display task only looks at an index across three
+    else{
+      change = 15;
+    }
     if(change>=15||change<=-15){
-        bloodPressRawBuf[prNext]=bpm;
+        pulseRateRawBuf[prNext]=bpm;
     }
 
 }

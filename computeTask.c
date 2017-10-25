@@ -25,7 +25,7 @@ void compute(void *data)
   //printf("diaCorrected: %i \n", cData->bloodPressCorrectedBufPtr[index + 8]);
   
   // Transform raw pulse rate data to corrected pulse rate data
-  //(cData->pulseRateCorrectedBufPtr[index + 8]) = (unsigned char)(8 + (3 * (cData->pulseRateRawBufPtr[index + 8])));
+  (cData->pulseRateCorrectedBufPtr[index]) = (unsigned char)(8 + (3 * (cData->pulseRateRawBufPtr[index])));
   //printf("PulseCorrected: %i \n", cData->pulseRateCorrectedBufPtr[index + 8]);
   
   // Designate for deletion
