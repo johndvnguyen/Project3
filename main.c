@@ -437,10 +437,14 @@ void schedule(void* data)
 
   warningT.taskPtr = alarm;
   warningT.taskDataPtr = (void*)&wPtrs2;
+
+  serialComT.taskPtr= communicate;
+  serialComT.taskDataPtr= (void*)&comPtrs;
   
   keypadT.taskPtr = keypadfunction;
   keypadT.taskDataPtr = (void*)&kPtrs;
 	
+  
   serialComT.taskPtr= communicate;
   serialComT.taskDataPtr= (void*)&comPtrs;
   
