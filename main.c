@@ -135,9 +135,11 @@ void schedule(void* data);
 void buttonTest();
 void keypadfunction(void* data);
 
-void insert(struct MyStruct* node);
+void add(struct MyStruct* node);
+void insert(struct MyStruct* current, struct MyStruct* new);
 struct MyStruct* head=NULL;
 struct MyStruct* tail=NULL;
+struct MyStruct* nodeRef=NULL;
 void delet(struct MyStruct* node);
 
 unsigned volatile int globalCounter = 0;
@@ -150,6 +152,8 @@ unsigned int auralCounter = 0;
 //*****************************************************************************
 unsigned long g_ulFlags;
 unsigned long auralFlag;
+unsigned long computeFlag;
+unsigned long serialFlag;
 
 
 
@@ -325,6 +329,9 @@ void schedule(void* data)
   // Counter to track the last time all tasks finished
   int previousCount = 0;
   auralFlag = 0;
+  computeFlag = 1;
+  serialFlag = 0;
+  int queueEnd = 0;
   
   unsigned long ulPeriod;
     
@@ -445,39 +452,31 @@ void schedule(void* data)
   serialComT.taskDataPtr= (void*)&comPtrs;
   
   //Initialize the task queue
-  insert(&measureT);
-  insert(&warningT);
-  insert(&statusT);
-  insert(&computeT);
-  insert(&displayT);
-  insert(&keypadT);
-  insert(&serialComT);
+  add(&measureT);
+  add(&warningT);
+  add(&statusT);
+  add(&computeT);
+  add(&displayT);
+  add(&keypadT);
   
-  //insert(&scheduleT);
+  // Assign the first task to head
+  aTCBPtr = head;
 
   //Dispatch the tasks
   while(1)
   {   
-    // Reschedule tasks after 5 seconds have elapsed
-    if(NULL==head && (globalCounter - previousCount >= 50)){
-      //printf("\n\n\nSCHEDULING!\n\n\n");
-      insert(&measureT);
-      insert(&warningT);
-      insert(&statusT);
-      insert(&computeT);
-      insert(&displayT);
-      insert(&keypadT);
-      insert(&serialComT);
+    // Only annunciate for 5 seconds
+    while(queueEnd && (globalCounter - previousCount <= 50))
+    {
+      annunciate(&wPtrs2);
     }
         
     // Continue to annunciate while other tasks are delayed
     annunciate(&wPtrs2);
     
-    // Execute task at head of linked list and then delete
+    // Execute task at head of linked list
     if(!(NULL==head))
     {
-      aTCBPtr = head;
-      
       // Begin measurement to empirically measure task
       //clock_t begin = clock();
       aTCBPtr->taskPtr((aTCBPtr->taskDataPtr) );
@@ -488,23 +487,70 @@ void schedule(void* data)
       // Find the task time
       //double time_spent = (double) (end - begin) / CLOCKS_PER_SEC;
       //printf("%f \n\n", time_spent);
-      delet(head);
-    
-      if(NULL == head)
+      
+      // Check if compute needs to be scheduled
+      if(computeFlag == 1)
+      {
+        computeFlag = 0;
+        insert(aTCBPtr, &computeT);
+       
+      }
+      // Check if comput needs to be deleted
+      if(computeFlag == 2)
+      {
+        computeFlag = 0;
+        
+        // Reference to next node
+        nodeRef = aTCBPtr->next;
+        delet(aTCBPtr);
+      }
+      
+      // Check if serial comm needs to be scheduled
+      if(serialFlag == 1)
+      {
+        serialFlag = 0;
+        insert(aTCBPtr, &serialComT);
+       
+      }
+      // Check if serial comm needs to be deleted
+      if(serialFlag == 2)
+      {
+        serialFlag = 0;
+        
+        // Reference to next node
+        nodeRef = aTCBPtr->next;
+        delet(aTCBPtr);
+      }
+      
+      // Wrap to begginning of queue
+      if(aTCBPtr == tail)
+      {
+        aTCBPtr = head;
+        queueEnd = 1;
         previousCount = globalCounter;
+      }
+      // Assign task pointer to node reference
+      else if(aTCBPtr->next == NULL)
+      {
+        aTCBPtr = nodeRef;
+      }
+      // Move to next task in queue
+      else
+      {
+      aTCBPtr = aTCBPtr->next;
+      }
     }
-   // buttonTest();
+    //buttonTest();
   }          
 }
 
-
 /*
-Function insert
+Function add
 Input: A node from the linked list
 Output: Null
-Do: Inserts a node (task) into the linked list
+Do: Addss a node (task) into the linked list
 */
-void insert(struct MyStruct* node)
+void add(struct MyStruct* node)
 {
   if(NULL==head){
     head=node;
@@ -517,6 +563,23 @@ void insert(struct MyStruct* node)
     tail=node;
   }
     return;
+}
+
+/*
+Function insert
+Input: The current node from the linked list and the node to be inserted
+Output: Null
+Do: Inserts a node (task) into the linked list
+*/
+void insert(struct MyStruct* current, struct MyStruct* new)
+{
+  new->next = current->next;
+  current->next = new;
+  new->prev = current;
+  
+  if(new->next != NULL)
+    new->next->prev = new;
+   return;
 }
 	
 /*

@@ -4,45 +4,35 @@
 #include "dataPtrs.h"
 #include "bool.h"
 #include "systemTimeBase.h"
+#include "Flags.h"
 
 
 void measure(void* data)
 {
-
-    //printf("\n CHECKING MEASUREMENTS! \n");
-    //cast the void* data to a measureData struct
-    //measureData * measureDataPtr = (measureData*) data;
     measureData2 * measureDataPtr = (measureData2*) data;
     
-    
-    //printf("Count Calls = %d \n", (*(*measureDataPtr).countCallsPtr));
-  
-    // all the print statements were for tracking the output without needing the debugger
-    //Comment/Uncomment the line below for project 2
-    //measureTemp(data);
-    //Comment/Uncomment the line below for project 3
     measureTempArray(data);
     
-    //Comment/Uncomment the line below for project 2
-    //measureSysBP(data);
-    //Comment/Uncomment the line below for project 3
     measureSysBPArray(data);
     
-    //Comment/Uncomment the line below for project 2
-    //measureDiaBP(data);
-    //Comment/Uncomment the line below for project 3
     measureDiaBPArray(data);
     
-    
     //measurePR(data);
-    
-    
     
     //Moved this to after the measurements so we start at index 0
     //increment the count entry
     ++(*(*measureDataPtr).countCallsPtr);
     
-    //TODO: ADD A FLAG TO addTask FOR COMPUTE TASK
+    // If compute task is already in queue don't add
+    if(computeFlag == 1)
+    {
+      computeFlag = 0;
+    }
+    // Add compute to queue if new measurement is made
+    else
+    {
+    computeFlag = 1;
+    }
 
   return;
 }
