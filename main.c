@@ -16,6 +16,7 @@
 #include "inc/hw_memmap.h"
 #include "inc/lm3s8962.h"
 #include "measureTask.h"
+#include "keypadTask.h"
 #include "serialComTask.h"
 #include "systemTimeBase.h"
 #include "warningAlarm.h"
@@ -97,6 +98,17 @@ warningAlarmData2 wPtrs2=
   &w1.auralCount
 };
 
+keypadData kPtrs=
+{
+  &k1.mode,
+  &k1.measurementSelection,
+  &k1.scroll,
+  &k1.selectChoice,
+  &k1.alarmAcknowledge
+
+};
+
+
 statusData sPtrs=
 {  
   &s1.batteryState
@@ -121,6 +133,7 @@ void measure(void* data);
 void stat(void* data);
 void alarm(void* data);
 void disp(void* data);
+void keypadfunction(void* data);
 void schedule(void* data);
 void buttonTest();
 
@@ -241,7 +254,8 @@ SysTickIntHandler(void)
 
     // Indicate that a timer interrupt has occurred.
     HWREGBITW(&g_ulFlags, FLAG_CLOCK_TICK) = 1;
-
+    
+    if(!HWREGBITW(&g_ulFlags, FLAG_BUTTON_PRESS)){
     // Read the state of the push buttons.
     ulData = (GPIOPinRead(GPIO_PORTE_BASE, (GPIO_PIN_0 | GPIO_PIN_1 |
                                             GPIO_PIN_2 | GPIO_PIN_3)) |
@@ -271,12 +285,14 @@ SysTickIntHandler(void)
     ulDelta ^= (g_ucSwitchClockA | g_ucSwitchClockB);
 
     // See if any switches just changed debounced state.
-    if(ulDelta)
+    if(ulDelta && (g_ucSwitches != 0x1F))
     {
         // You can watch the variable for ulDelta
         // Up = 1 Right = 8 down =2 left =4  select = 16 Bit values
         // Add the current tick count to the entropy pool.
         printf("A button was pressed %d \n", ulDelta);
+        HWREGBITW(&g_ulFlags, FLAG_BUTTON_PRESS) = 1;
+    }
     }
 
     // See if the select button was just pressed.
@@ -401,6 +417,7 @@ void schedule(void* data)
   TCB computeT;
   TCB warningT;
   TCB serialComT;
+  TCB keypadT;
   
   //  Declare a working TCB pointer
   TCB* aTCBPtr;
@@ -420,7 +437,13 @@ void schedule(void* data)
 
   warningT.taskPtr = alarm;
   warningT.taskDataPtr = (void*)&wPtrs2;
-	
+
+  serialComT.taskPtr= communicate;
+  serialComT.taskDataPtr= (void*)&comPtrs;
+  
+  keypadT.taskPtr = keypadfunction;
+  keypadT.taskDataPtr = (void*)&kPtrs;
+  
   serialComT.taskPtr= communicate;
   serialComT.taskDataPtr= (void*)&comPtrs;
   
@@ -431,6 +454,7 @@ void schedule(void* data)
   insert(&computeT);
   insert(&displayT);
   insert(&serialComT);
+  insert(&keypadT);
   //insert(&scheduleT);
 
   //Dispatch the tasks
@@ -445,6 +469,7 @@ void schedule(void* data)
       insert(&computeT);
       insert(&displayT);
       insert(&serialComT);
+      insert(&keypadT);
     }
         
     // Continue to annunciate while other tasks are delayed
@@ -535,5 +560,5 @@ void buttonTest(){
 
     // Throw away any button presses that may have occurred while the splash
     // screens were being displayed.
-    HWREGBITW(&g_ulFlags, FLAG_BUTTON_PRESS) = 0;
+    //HWREGBITW(&g_ulFlags, FLAG_BUTTON_PRESS) = 0;
 };
