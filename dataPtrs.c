@@ -11,8 +11,7 @@ typedef struct
   unsigned int* sysCompletePtr;
   unsigned int* diaCompletePtr;
   int* tempDirectionPtr;
-  int* prDirectionPtr;
-  unsigned short* measurementSelectionPtr;
+  unsigned long* prPtr;
 } measureData2;
 
 // Holds pointers to the variables associated with compute task:
