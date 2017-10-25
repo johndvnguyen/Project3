@@ -37,6 +37,9 @@ INIT_WARNING(w1);
 INIT_SCHEDULER(c1);
 INIT_KEYPAD(k1);
 
+//flag for pulse transducer
+unsigned long g_ulFlagPR=0;
+
 //Connect pointer structs to data
 measureData2 mPtrs2 = 
 {     
@@ -47,7 +50,7 @@ measureData2 mPtrs2 =
   &m2.sysComplete,
   &m2.diaComplete,
   &m2.tempDirection,
-  &m2.prDirection
+  &g_ulFlagPR
 };
 
 computeData2 cPtrs2=
@@ -144,6 +147,8 @@ void delet(struct MyStruct* node);
 
 unsigned volatile int globalCounter = 0;
 unsigned int auralCounter = 0;
+unsigned int pulseFreq=4;
+unsigned int pulseCount=0;
 //*****************************************************************************
 //
 // Flags that contain the current value of the interrupt indicator as displayed
@@ -242,6 +247,45 @@ Timer0IntHandler(void)
     //annunciate(&wPtrs2);
     IntMasterEnable();
 }
+//*****************************************************************************
+//
+// The interrupt handler for the pulse rate transducer interrupt.
+//
+//*****************************************************************************
+void
+Timer2IntHandler(void)
+{
+    //
+    // Clear the timer interrupt.
+    //
+    TimerIntClear(TIMER2_BASE, TIMER_TIMA_TIMEOUT);
+    
+    pulseCount++;
+        
+    if(pulseCount>20){
+      pulseFreq=3;
+    }
+    else if(pulseCount >40){
+      pulseFreq = 2;
+    }
+    else if(pulseCount >60){
+      pulseFreq=1;
+    }
+    else if (pulseCount>80){
+      pulseFreq =4;
+      pulseCount =0;
+    }
+    
+    TimerLoadSet(TIMER2_BASE, TIMER_A, (SysCtlClockGet()/pulseFreq)/2-1);
+    //
+    // Update PR Flag
+    //
+    if(g_ulFlagPR==0){
+      g_ulFlagPR=1;
+    }
+    else
+      g_ulFlagPR=0;
+}
 
 //*****************************************************************************
 //
@@ -334,6 +378,7 @@ void schedule(void* data)
   int queueEnd = 0;
   
   unsigned long ulPeriod;
+  unsigned long ulPeriodPR;
     
   // Set the clocking to run directly from the crystal.
   SysCtlClockSet(SYSCTL_SYSDIV_1 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
@@ -343,6 +388,7 @@ void schedule(void* data)
 
   // Enable the peripherals used by this example.
   SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER2); 
   SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
   SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
   SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
@@ -381,18 +427,27 @@ void schedule(void* data)
                         (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
                          UART_CONFIG_PAR_NONE));
 	
+  ulPeriodPR =(SysCtlClockGet()/4)/2 ;
   //**INITIALIZE TIMER INTERRUPT**//
   // Configure the 32-bit periodic timer.
   TimerConfigure(TIMER0_BASE, TIMER_CFG_32_BIT_PER);
+  TimerConfigure(TIMER2_BASE, TIMER_CFG_32_BIT_PER);
   TimerLoadSet(TIMER0_BASE, TIMER_A, SysCtlClockGet()/10);
+  TimerLoadSet(TIMER2_BASE, TIMER_A, ulPeriodPR-1);
 
   // Setup the interrupt for the timer timeout.
   IntEnable(INT_TIMER0A);
+  IntEnable(INT_TIMER2A);
+  
   TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
-
+  TimerIntEnable(TIMER2_BASE, TIMER_TIMA_TIMEOUT);
+  
   // Enable the timer.
   TimerEnable(TIMER0_BASE, TIMER_A);
+  TimerEnable(TIMER2_BASE, TIMER_A);
   
+  	
+
   //**INITIAL SOUND WARNING**//
   // Set GPIO G1 as PWM pin.  They are used to output the PWM1 signal.
   GPIOPinTypePWM(GPIO_PORTG_BASE, GPIO_PIN_1);
