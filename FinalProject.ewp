@@ -1664,6 +1664,12 @@
     <name>$PROJ_DIR$\Flags.h</name>
   </file>
   <file>
+    <name>$PROJ_DIR$\keypadTask.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\keypadTask.h</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\main.c</name>
   </file>
   <file>

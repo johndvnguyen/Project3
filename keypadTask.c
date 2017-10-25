@@ -35,9 +35,9 @@ void keypadfunction(void* data)
     unsigned short * measurementSelectionPtr = (*keypadDataPtr).measurementSelectionPtr;
     unsigned short * selectChoicePtr = (*keypadDataPtr).selectChoicePtr;
     unsigned int row;
+    int choice = 0;
     //Mode selection (Mode 0, main menu)
     if(*modePtr == 0){
-      
       
       //down is pressed and the cursor is not on annunciate
       if(g_ucSwitches==29 && *selectChoicePtr!=2){
@@ -48,11 +48,12 @@ void keypadfunction(void* data)
         *selectChoicePtr = 1;
       }
       //Check to see if a selection was made
-      if(g_ucSwitches==15&& auralFlag==0){
+      if(g_ucSwitches==15){
         //update the mode selection
         *modePtr = *selectChoicePtr;
         //update the choice back to one
         *selectChoicePtr=1;
+        choice = 1;
       }
       
       // if modechoice is hovering on annunciation show cursor in second row
@@ -64,9 +65,8 @@ void keypadfunction(void* data)
       }
     }
     //Measurement selection (Mode 1 for menu)
-    if(*modePtr == 1){
-      
-      
+    if(*modePtr == 1 && choice != 1){
+
       //down is pressed and the cursor is not on annunciate
       if(g_ucSwitches==29 && *selectChoicePtr!=3){
         (*selectChoicePtr) += 1;
@@ -79,9 +79,10 @@ void keypadfunction(void* data)
       if(g_ucSwitches==15&& auralFlag==0){
         //update the measurement selection
         *measurementSelectionPtr = *selectChoicePtr;
-
+        *modePtr = 0;
+        choice = 1;
       }
-      
+       
       // if modechoice is hovering on annunciation show cursor in second row
       // if not show it in the first row (This is to help with initializing subsquent menus)
       switch(*selectChoicePtr){
@@ -95,10 +96,9 @@ void keypadfunction(void* data)
           row = 30;
           break;
       }
-     
     }
     
-    
+    // Char to hold the cursor symbol
     char cursor[20];
     usprintf(cursor,"*");
     
@@ -109,13 +109,16 @@ void keypadfunction(void* data)
       RIT128x96x4StringDraw(cursor,5,row,15);
     }
     
-    
+    // If in annunciate and select is pressed set mode to main menu
+    if(*modePtr == 2 && choice != 1){
+      if(g_ucSwitches==15&& auralFlag==0){
+        *modePtr = 0;
+      }
+    }
+   
     //Reset button pressed flag to 0 if set
     if(HWREGBITW(&g_ulFlags, FLAG_BUTTON_PRESS)){
       HWREGBITW(&g_ulFlags, FLAG_BUTTON_PRESS) = 0;  
     }
-    
-   
-
   return;
 }
