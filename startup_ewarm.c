@@ -45,6 +45,7 @@ static void IntDefaultHandler(void);
 //
 //*****************************************************************************
 extern void Timer0IntHandler(void);
+extern void Timer2IntHandler(void);
 
 //*****************************************************************************
 //
