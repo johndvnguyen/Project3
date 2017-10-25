@@ -339,7 +339,7 @@ SysTickIntHandler(void)
             auralCounter = globalCounter;
         }
         // See if any switches just changed debounced state.
-        else if(ulDelta && (g_ucSwitches != 0x1F))
+        if(ulDelta && (g_ucSwitches != 0x1F))
         {
             // You can watch the variable for ulDelta
             // Up = 1 Right = 8 down =2 left =4  select = 16 Bit values
