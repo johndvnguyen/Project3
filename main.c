@@ -443,7 +443,6 @@ void schedule(void* data)
   
   keypadT.taskPtr = keypadfunction;
   keypadT.taskDataPtr = (void*)&kPtrs;
-	
   
   serialComT.taskPtr= communicate;
   serialComT.taskDataPtr= (void*)&comPtrs;
