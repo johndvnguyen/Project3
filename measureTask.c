@@ -34,7 +34,8 @@ void measure(void* data)
     measureDiaBPArray(data);
     
     
-    //measurePR(data);
+    measurePRArray(data);
+    
     
     
     
